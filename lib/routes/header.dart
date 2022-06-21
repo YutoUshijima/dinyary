@@ -9,12 +9,16 @@ class Header extends StatelessWidget with PreferredSizeWidget{
    return AppBar(
      leading: Padding(
        padding: const EdgeInsets.all(8.0),
-       child: Icon(Icons.settings),
+       child: Icon(Icons.account_circle),
      ),
      actions: [
        Padding(
          padding: const EdgeInsets.all(8.0),
-         child: Icon(Icons.add),
+         child: Icon(Icons.create_outlined),
+       ),
+       Padding(
+         padding: const EdgeInsets.all(8.0),
+         child: Icon(Icons.settings),
        ),
      ],
      title: Text(

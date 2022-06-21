@@ -2,9 +2,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 // == 作成したWidget をインポート ==================
-import 'routes/home_route.dart';
-import 'routes/user_route.dart';
 import 'routes/timeline_route.dart';
+import 'routes/map_route.dart';
+import 'routes/calendar_route.dart';
+import 'routes/analysis_route.dart';
+//import 'routes/home_route.dart';
+//import 'routes/user_route.dart';
 import 'routes/game_route.dart';
 // =============================================
 
@@ -20,26 +23,28 @@ class _RootWidgetState extends State<RootWidget> {
   final _bottomNavigationBarItems = <BottomNavigationBarItem>[];
 
   static const _footerIcons = [
-    Icons.home,
     Icons.textsms,
-    Icons.access_time,
+    Icons.map,
+    Icons.calendar_month,
     Icons.content_paste,
-    Icons.work,
+    Icons.videogame_asset,
   ];
 
   static const _footerItemNames = [
-    'ホーム',
-    '日記投稿',
-    'ゲーム',
-    '登録情報',
+    'TimeLine',
+    'Map',
+    'Calendar',
+    'Analysis',
+    'Game',
   ];
 
   // === 追加部分 ===
   var _routes = [
-    Home(),
     TimeLine(),
+    Map(),
+    Calendar(),
+    Analysis(),
     Game(),
-    User(),
   ];
   // ==============
 
@@ -55,23 +60,21 @@ class _RootWidgetState extends State<RootWidget> {
   /// インデックスのアイテムをアクティベートする
   BottomNavigationBarItem _UpdateActiveState(int index) {
     return BottomNavigationBarItem(
-        icon: Icon(
-          _footerIcons[index],
-          color: Colors.black87,
-        ),
-        label:
-          _footerItemNames[index],
+      icon: Icon(
+        _footerIcons[index],
+        color: Colors.black87,
+      ),
+      label: _footerItemNames[index],
     );
   }
 
   BottomNavigationBarItem _UpdateDeactiveState(int index) {
     return BottomNavigationBarItem(
-        icon: Icon(
-          _footerIcons[index],
-          color: Colors.black26,
-        ),
-        label:
-          _footerItemNames[index],
+      icon: Icon(
+        _footerIcons[index],
+        color: Colors.black26,
+      ),
+      label: _footerItemNames[index],
     );
   }
 
