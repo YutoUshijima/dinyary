@@ -18,7 +18,7 @@ class Header extends StatelessWidget with PreferredSizeWidget{
        ),
      ],
      title: Text(
-       'ホーム',
+       'diNyary',
 		 ),
      backgroundColor: Colors.black87,
      centerTitle: true,

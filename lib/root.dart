@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 // == 作成したWidget をインポート ==================
 import 'routes/home_route.dart';
-import 'routes/User_route.dart';
+import 'routes/user_route.dart';
 import 'routes/timeline_route.dart';
 import 'routes/game_route.dart';
 // =============================================
@@ -59,7 +59,7 @@ class _RootWidgetState extends State<RootWidget> {
           _footerIcons[index],
           color: Colors.black87,
         ),
-        label: 
+        label:
           _footerItemNames[index],
     );
   }

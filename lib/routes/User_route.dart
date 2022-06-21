@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
+import 'header.dart';
 
-class User extends StatelessWidget { // <- (※1)
+class User extends StatelessWidget {
+  // <- (※1)
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("登録情報"), // <- (※2)
-      ),
+      appBar: Header(),
       body: Center(child: Text("登録情報") // <- (※3)
           ),
     );
