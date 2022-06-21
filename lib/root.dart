@@ -3,10 +3,9 @@ import 'package:flutter/material.dart';
 
 // == 作成したWidget をインポート ==================
 import 'routes/home_route.dart';
-import 'routes/talk_route.dart';
+import 'routes/User_route.dart';
 import 'routes/timeline_route.dart';
-import 'routes/wallet_route.dart';
-import 'routes/news_route.dart';
+import 'routes/game_route.dart';
 // =============================================
 
 class RootWidget extends StatefulWidget {
@@ -30,19 +29,17 @@ class _RootWidgetState extends State<RootWidget> {
 
   static const _footerItemNames = [
     'ホーム',
-    'トーク',
-    'タイムライン',
-    'ニュース',
-    'ウォレット',
+    '日記投稿',
+    'ゲーム',
+    '登録情報',
   ];
 
   // === 追加部分 ===
   var _routes = [
     Home(),
-    Talk(),
     TimeLine(),
-    News(),
-    Wallet(),
+    Game(),
+    User(),
   ];
   // ==============
 
