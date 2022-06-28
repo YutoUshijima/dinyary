@@ -14,20 +14,3 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
-
-## 最初に
-
-今できてること
-
-- ホームページ/日記投稿/ゲーム/登録情報のページの雛形
-- 何か意味ありげなヘッダー
-
-やるべきこと
-
-- 各ページの内容充実
-
-使い方(VSCode の場合)
-
-- 右下のデバイス選択から好きな OS を選択
-- デバッグを走らせる
-- save すると自動で更新されるけど、何か変な時はデバッグを再度走らせよう

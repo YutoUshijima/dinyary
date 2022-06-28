@@ -1,8 +1,8 @@
 //import 'package:dinyary/routes/home_route.dart';
+import 'package:dinyary/routes/header.dart';
 import 'package:flutter/material.dart';
 //import 'header.dart';
 import 'NoteViewModel.dart';
-
 
 class TimeLine extends StatefulWidget {
   const TimeLine({Key? key}) : super(key: key);
@@ -15,6 +15,8 @@ class _HomePageState extends State<TimeLine> {
   List<Map<String, dynamic>> _memo = [];
 
   bool _isLoading = true;
+  String? _isSelectedItem = "Others";
+  String? _isSelectedItem_now = "Others";
 
   void _refreshJournals() async {
     final data = await NoteViewModel.getNotes();
@@ -30,15 +32,16 @@ class _HomePageState extends State<TimeLine> {
     _refreshJournals();
   }
 
-  final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _diaryController = TextEditingController();
+  //final TextEditingController _tagController = TextEditingController();
 
   void _showForm(int? id) async {
     if (id != null) {
       final existingJournal =
           _memo.firstWhere((element) => element['id'] == id);
-      _titleController.text = existingJournal['title'];
-      _descriptionController.text = existingJournal['description'];
+      _diaryController.text = existingJournal['diary'];
+      _isSelectedItem = existingJournal['tag'];
+      //_tagController.text = existingJournal['tag'];
     }
 
     showModalBottomSheet(
@@ -57,15 +60,42 @@ class _HomePageState extends State<TimeLine> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   TextField(
-                    controller: _titleController,
-                    decoration: const InputDecoration(hintText: 'Title'),
+                    controller: _diaryController,
+                    decoration: const InputDecoration(hintText: '日記を書いてみよう！'),
                   ),
                   const SizedBox(
                     height: 10,
                   ),
-                  TextField(
-                    controller: _descriptionController,
-                    decoration: const InputDecoration(hintText: 'Description'),
+                  DropdownButton<String>(
+                    //4
+                    items: const [
+                      //5
+                      DropdownMenuItem(
+                        child: Text('Get up'),
+                        value: 'Get up',
+                      ),
+                      DropdownMenuItem(
+                        child: Text('Going to bed'),
+                        value: 'Going to bed',
+                      ),
+                      DropdownMenuItem(
+                        child: Text('Exercise'),
+                        value: 'Exercise',
+                      ),
+                      DropdownMenuItem(
+                        child: Text('Others'),
+                        value: 'Others',
+                      ),
+                    ],
+                    //6
+                    onChanged: (String? value) {
+                      setState(() {
+                        _isSelectedItem = value;
+                        _isSelectedItem_now = value;
+                      });
+                    },
+                    //7
+                    value: _isSelectedItem_now,
                   ),
                   const SizedBox(
                     height: 20,
@@ -79,8 +109,9 @@ class _HomePageState extends State<TimeLine> {
                       if (id != null) {
                         await _updateItem(id);
                       }
-                      _titleController.text = '';
-                      _descriptionController.text = '';
+                      _diaryController.text = '';
+                      _isSelectedItem = 'Others';
+                      //_tagController.text = '';
 
                       Navigator.of(context).pop();
                     },
@@ -93,20 +124,20 @@ class _HomePageState extends State<TimeLine> {
 
   Future<void> _addItem() async {
     await NoteViewModel.createItem(
-        _titleController.text, _descriptionController.text);
+        _diaryController.text, _isSelectedItem); //_tagController.text);
     _refreshJournals();
   }
 
   Future<void> _updateItem(int id) async {
     await NoteViewModel.updateItem(
-        id, _titleController.text, _descriptionController.text);
+        id, _diaryController.text, _isSelectedItem); //_tagController.text);
     _refreshJournals();
   }
 
   void _deleteItem(int id) async {
     await NoteViewModel.deleteItem(id);
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-      content: Text('Successfully deleted a journal!'),
+      content: Text('Successfully deleted a diary!'),
     ));
     _refreshJournals();
   }
@@ -114,9 +145,7 @@ class _HomePageState extends State<TimeLine> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Notes'),
-      ),
+      appBar: Header(),
       body: _isLoading
           ? const Center(
               child: CircularProgressIndicator(),
@@ -124,21 +153,33 @@ class _HomePageState extends State<TimeLine> {
           : ListView.builder(
               itemCount: _memo.length,
               itemBuilder: (context, index) => Card(
-                color: Colors.deepPurple[200],
-                margin: const EdgeInsets.all(15),
+                color: Color.fromARGB(255, 255, 255, 255),
+                margin: const EdgeInsets.all(3),
                 child: ListTile(
-                    title: Text(_memo[index]['title']),
-                    subtitle: Text(_memo[index]['description']),
+                    leading: Icon(
+                      _memo[index]['tag'] == "Get up"
+                          ? Icons.sunny
+                          : _memo[index]['tag'] == "Going to bed"
+                              ? Icons.airline_seat_individual_suite
+                              : _memo[index]['tag'] == "Exercise"
+                                  ? Icons.fitness_center
+                                  : Icons.insert_emoticon,
+                      size: 20,
+                    ),
+                    title: Text(_memo[index]['diary']),
+                    subtitle: Text(_memo[index]['createdAt']),
                     trailing: SizedBox(
-                      width: 100,
+                      width: 96,
+                      //height: 100,
                       child: Row(
                         children: [
                           IconButton(
                             icon: const Icon(Icons.edit),
+                            //iconSize: 10,
                             onPressed: () => _showForm(_memo[index]['id']),
                           ),
                           IconButton(
-                            icon: const Icon(Icons.delete),
+                            icon: const Icon(Icons.delete, size: 30),
                             onPressed: () => _deleteItem(_memo[index]['id']),
                           ),
                         ],
