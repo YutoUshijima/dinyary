@@ -169,8 +169,8 @@ class _HomePageState extends State<TimeLine> {
             barrierDismissible: false,
             builder: (_) {
               return AlertDialog(
-                title: Text("This is the title"),
-                content: Text("This is the content"),
+                title: Text("本当に削除しますか？"),
+                content: Text("この操作は取り消せません。"),
                 actions: [
                   TextButton(
                     child: Text("Cancel"),
