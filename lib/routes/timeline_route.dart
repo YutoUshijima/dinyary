@@ -15,8 +15,10 @@ class _HomePageState extends State<TimeLine> {
   List<Map<String, dynamic>> _memo = [];
 
   bool _isLoading = true;
-  String? _isSelectedItem = "Others";
-  String? _isSelectedItem_now = "Others";
+  String? _tagController = "Others";
+  String? newValue = "1";
+
+  //var _isSelectedItem = "Others";
 
   void _refreshJournals() async {
     final data = await NoteViewModel.getNotes();
@@ -40,7 +42,7 @@ class _HomePageState extends State<TimeLine> {
       final existingJournal =
           _memo.firstWhere((element) => element['id'] == id);
       _diaryController.text = existingJournal['diary'];
-      _isSelectedItem = existingJournal['tag'];
+      _tagController = existingJournal['tag'];
       //_tagController.text = existingJournal['tag'];
     }
 
@@ -66,10 +68,9 @@ class _HomePageState extends State<TimeLine> {
                   const SizedBox(
                     height: 10,
                   ),
-                  DropdownButton<String>(
-                    //4
+                  // DropdownButtonだとバグるので注意
+                  DropdownButtonFormField<String>(
                     items: const [
-                      //5
                       DropdownMenuItem(
                         child: Text('Get up'),
                         value: 'Get up',
@@ -87,15 +88,13 @@ class _HomePageState extends State<TimeLine> {
                         value: 'Others',
                       ),
                     ],
-                    //6
-                    onChanged: (String? value) {
+                    value: _tagController,
+                    onChanged: (String? changedValue) {
                       setState(() {
-                        _isSelectedItem = value;
-                        _isSelectedItem_now = value;
+                        //_isSelectedItem = changedValue ?? "";
+                        _tagController = changedValue;
                       });
                     },
-                    //7
-                    value: _isSelectedItem_now,
                   ),
                   const SizedBox(
                     height: 20,
@@ -105,14 +104,12 @@ class _HomePageState extends State<TimeLine> {
                       if (id == null) {
                         await _addItem();
                       }
-
                       if (id != null) {
                         await _updateItem(id);
                       }
                       _diaryController.text = '';
-                      _isSelectedItem = 'Others';
+                      _tagController = 'Others';
                       //_tagController.text = '';
-
                       Navigator.of(context).pop();
                     },
                     child: Text(id == null ? 'Create New' : 'Update'),
@@ -124,13 +121,13 @@ class _HomePageState extends State<TimeLine> {
 
   Future<void> _addItem() async {
     await NoteViewModel.createItem(
-        _diaryController.text, _isSelectedItem); //_tagController.text);
+        _diaryController.text, _tagController); //_tagController.text);
     _refreshJournals();
   }
 
   Future<void> _updateItem(int id) async {
     await NoteViewModel.updateItem(
-        id, _diaryController.text, _isSelectedItem); //_tagController.text);
+        id, _diaryController.text, _tagController); //_tagController.text);
     _refreshJournals();
   }
 
