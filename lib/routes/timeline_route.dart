@@ -3,6 +3,8 @@ import 'package:dinyary/routes/header.dart';
 import 'package:flutter/material.dart';
 //import 'header.dart';
 import 'NoteViewModel.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 
 class TimeLine extends StatefulWidget {
   const TimeLine({Key? key}) : super(key: key);
@@ -11,7 +13,7 @@ class TimeLine extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-enum Menu { edit, delete }
+enum Menu { image, edit, delete }
 
 class _HomePageState extends State<TimeLine> {
   List<Map<String, dynamic>> _memo = [];
@@ -39,6 +41,7 @@ class _HomePageState extends State<TimeLine> {
 
   final TextEditingController _diaryController = TextEditingController();
   //final TextEditingController _tagController = TextEditingController();
+  final picker = ImagePicker();
 
   void _showForm(int? id) async {
     if (id != null) {
@@ -139,6 +142,7 @@ class _HomePageState extends State<TimeLine> {
   void _deleteItem(int id) async {
     await NoteViewModel.deleteItem(id);
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      duration: const Duration(milliseconds: 1500),
       content: Text('Successfully deleted a diary!'),
     ));
     _refreshJournals();
@@ -146,6 +150,16 @@ class _HomePageState extends State<TimeLine> {
 
   void popupMenuSelected(Menu selectedMenu, index) {
     switch (selectedMenu) {
+      case Menu.image:
+        () async {
+          var pickedFile = await picker.pickImage(source: ImageSource.gallery);
+          try {
+            File file = File((pickedFile!).path);
+          } catch (e) {
+            print(e);
+          }
+        };
+        break;
       case Menu.edit:
         _showForm(_memo[index]['id']);
         break;
@@ -212,6 +226,12 @@ class _HomePageState extends State<TimeLine> {
                       itemBuilder: (BuildContext context) =>
                           <PopupMenuEntry<Menu>>[
                             const PopupMenuItem<Menu>(
+                              value: Menu.image,
+                              child: ListTile(
+                                  leading: Icon(Icons.image),
+                                  title: Text("image")),
+                            ),
+                            const PopupMenuItem<Menu>(
                               value: Menu.edit,
                               child: ListTile(
                                   leading: Icon(Icons.edit),
@@ -234,4 +254,3 @@ class _HomePageState extends State<TimeLine> {
     );
   }
 }
-
