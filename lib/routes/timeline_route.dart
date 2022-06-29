@@ -11,12 +11,15 @@ class TimeLine extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
+enum Menu { edit, delete }
+
 class _HomePageState extends State<TimeLine> {
   List<Map<String, dynamic>> _memo = [];
 
   bool _isLoading = true;
   String? _tagController = "Others";
   String? newValue = "1";
+  String _selectedMenu = '';
 
   //var _isSelectedItem = "Others";
 
@@ -63,6 +66,8 @@ class _HomePageState extends State<TimeLine> {
                 children: [
                   TextField(
                     controller: _diaryController,
+                    keyboardType: TextInputType.multiline,
+                    maxLines: null,
                     decoration: const InputDecoration(hintText: '日記を書いてみよう！'),
                   ),
                   const SizedBox(
@@ -139,6 +144,41 @@ class _HomePageState extends State<TimeLine> {
     _refreshJournals();
   }
 
+  void popupMenuSelected(Menu selectedMenu, index) {
+    switch (selectedMenu) {
+      case Menu.edit:
+        _showForm(_memo[index]['id']);
+        break;
+      case Menu.delete:
+        showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (_) {
+              return AlertDialog(
+                title: Text("This is the title"),
+                content: Text("This is the content"),
+                actions: [
+                  TextButton(
+                    child: Text("Cancel"),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                  TextButton(
+                    child: Text("OK"),
+                    onPressed: () {
+                      _deleteItem(_memo[index]['id']);
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              );
+            });
+        break;
+      default:
+        debugPrint("Error");
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -153,35 +193,38 @@ class _HomePageState extends State<TimeLine> {
                 color: Color.fromARGB(255, 255, 255, 255),
                 margin: const EdgeInsets.all(3),
                 child: ListTile(
-                    leading: Icon(
-                      _memo[index]['tag'] == "Get up"
-                          ? Icons.sunny
-                          : _memo[index]['tag'] == "Going to bed"
-                              ? Icons.airline_seat_individual_suite
-                              : _memo[index]['tag'] == "Exercise"
-                                  ? Icons.fitness_center
-                                  : Icons.insert_emoticon,
-                      size: 20,
-                    ),
-                    title: Text(_memo[index]['diary']),
-                    subtitle: Text(_memo[index]['createdAt']),
-                    trailing: SizedBox(
-                      width: 96,
-                      //height: 100,
-                      child: Row(
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.edit),
-                            //iconSize: 10,
-                            onPressed: () => _showForm(_memo[index]['id']),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.delete, size: 30),
-                            onPressed: () => _deleteItem(_memo[index]['id']),
-                          ),
-                        ],
-                      ),
-                    )),
+                  leading: Icon(
+                    _memo[index]['tag'] == "Get up"
+                        ? Icons.sunny
+                        : _memo[index]['tag'] == "Going to bed"
+                            ? Icons.airline_seat_individual_suite
+                            : _memo[index]['tag'] == "Exercise"
+                                ? Icons.fitness_center
+                                : Icons.insert_emoticon,
+                    size: 20,
+                  ),
+                  title: Text(_memo[index]['diary']),
+                  subtitle: Text(_memo[index]['createdAt']),
+                  trailing: PopupMenuButton<Menu>(
+                      onSelected: (Menu item) {
+                        popupMenuSelected(item, index);
+                      },
+                      itemBuilder: (BuildContext context) =>
+                          <PopupMenuEntry<Menu>>[
+                            const PopupMenuItem<Menu>(
+                              value: Menu.edit,
+                              child: ListTile(
+                                  leading: Icon(Icons.edit),
+                                  title: Text("edit")),
+                            ),
+                            const PopupMenuItem<Menu>(
+                              value: Menu.delete,
+                              child: ListTile(
+                                  leading: Icon(Icons.delete),
+                                  title: Text("delete")),
+                            ),
+                          ]),
+                ),
               ),
             ),
       floatingActionButton: FloatingActionButton(
@@ -191,3 +234,4 @@ class _HomePageState extends State<TimeLine> {
     );
   }
 }
+
