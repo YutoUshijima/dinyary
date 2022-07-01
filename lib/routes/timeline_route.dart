@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 //import 'header.dart';
 import 'NoteViewModel.dart';
 import 'dart:io';
+import 'dart:convert';
 import 'package:image_picker/image_picker.dart';
 
 class TimeLine extends StatefulWidget {
@@ -18,10 +19,15 @@ enum Menu { image, edit, delete }
 class _HomePageState extends State<TimeLine> {
   List<Map<String, dynamic>> _memo = [];
 
+  // 初期値
   bool _isLoading = true;
   String? _tagController = "Others";
   String? newValue = "1";
   String _selectedMenu = '';
+  final TextEditingController _diaryController = TextEditingController();
+  //final TextEditingController _tagController = TextEditingController();
+
+  final picker = ImagePicker();
 
   //var _isSelectedItem = "Others";
 
@@ -39,10 +45,7 @@ class _HomePageState extends State<TimeLine> {
     _refreshJournals();
   }
 
-  final TextEditingController _diaryController = TextEditingController();
-  //final TextEditingController _tagController = TextEditingController();
-  final picker = ImagePicker();
-
+  // 日記投稿パネル表示
   void _showForm(int? id) async {
     if (id != null) {
       final existingJournal =
@@ -51,7 +54,6 @@ class _HomePageState extends State<TimeLine> {
       _tagController = existingJournal['tag'];
       //_tagController.text = existingJournal['tag'];
     }
-
     showModalBottomSheet(
         context: context,
         elevation: 5,
@@ -139,6 +141,7 @@ class _HomePageState extends State<TimeLine> {
     _refreshJournals();
   }
 
+  // アイテムの削除
   void _deleteItem(int id) async {
     await NoteViewModel.deleteItem(id);
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -148,17 +151,28 @@ class _HomePageState extends State<TimeLine> {
     _refreshJournals();
   }
 
+  // 画像インポートのための関数
+  // そのまま記述したら動かなかった......
+  // 何度も動かすと時々エラーを吐きます(公式仕様)
+  Future<String> _image_picker() async {
+    var pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    try {
+      //File file = File((pickedFile!).path);
+      final bytes = File((pickedFile!).path).readAsBytesSync();
+      String img64 = base64Encode(bytes);
+      print(img64.substring(0, 100));
+      return img64;
+    } catch (e) {
+      debugPrint("Error");
+      return "";
+    }
+  }
+
+  // ポップアップメニュー選択時の挙動
   void popupMenuSelected(Menu selectedMenu, index) {
     switch (selectedMenu) {
       case Menu.image:
-        () async {
-          var pickedFile = await picker.pickImage(source: ImageSource.gallery);
-          try {
-            File file = File((pickedFile!).path);
-          } catch (e) {
-            print(e);
-          }
-        };
+        _image_picker();
         break;
       case Menu.edit:
         _showForm(_memo[index]['id']);
@@ -196,7 +210,9 @@ class _HomePageState extends State<TimeLine> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      //ヘッダー
       appBar: Header(),
+      // 日記の描画
       body: _isLoading
           ? const Center(
               child: CircularProgressIndicator(),
@@ -207,6 +223,7 @@ class _HomePageState extends State<TimeLine> {
                 color: Color.fromARGB(255, 255, 255, 255),
                 margin: const EdgeInsets.all(3),
                 child: ListTile(
+                  // タグに応じてアイコンを変更
                   leading: Icon(
                     _memo[index]['tag'] == "Get up"
                         ? Icons.sunny
@@ -217,8 +234,11 @@ class _HomePageState extends State<TimeLine> {
                                 : Icons.insert_emoticon,
                     size: 20,
                   ),
+                  // 日記本文
                   title: Text(_memo[index]['diary']),
+                  // 投稿日時
                   subtitle: Text(_memo[index]['createdAt']),
+                  // ポップアップメニュー
                   trailing: PopupMenuButton<Menu>(
                       onSelected: (Menu item) {
                         popupMenuSelected(item, index);
@@ -247,6 +267,7 @@ class _HomePageState extends State<TimeLine> {
                 ),
               ),
             ),
+      // 日記投稿ボタン(削除予定？)
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
         onPressed: () => _showForm(null),
