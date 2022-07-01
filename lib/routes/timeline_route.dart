@@ -1,4 +1,6 @@
 //import 'package:dinyary/routes/home_route.dart';
+import 'dart:typed_data';
+
 import 'package:dinyary/routes/header.dart';
 import 'package:flutter/material.dart';
 //import 'header.dart';
@@ -6,6 +8,7 @@ import 'NoteViewModel.dart';
 import 'dart:io';
 import 'dart:convert';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 
 class TimeLine extends StatefulWidget {
   const TimeLine({Key? key}) : super(key: key);
@@ -24,6 +27,7 @@ class _HomePageState extends State<TimeLine> {
   String? _tagController = "Others";
   String? newValue = "1";
   String _selectedMenu = '';
+  String _appDocPath = "";
   final TextEditingController _diaryController = TextEditingController();
   //final TextEditingController _tagController = TextEditingController();
 
@@ -152,19 +156,36 @@ class _HomePageState extends State<TimeLine> {
   }
 
   // 画像インポートのための関数
-  // そのまま記述したら動かなかった......
-  // 何度も動かすと時々エラーを吐きます(公式仕様)
-  Future<String> _image_picker() async {
+  Future<void> _imagePicker(int id) async {
+    // ギャラリーの1枚目を選択するとバグるので注意!!!
     var pickedFile = await picker.pickImage(source: ImageSource.gallery);
     try {
-      //File file = File((pickedFile!).path);
-      final bytes = File((pickedFile!).path).readAsBytesSync();
-      String img64 = base64Encode(bytes);
-      print(img64.substring(0, 100));
-      return img64;
+      // ファイルをギャラリからインポート
+      print(_memo[id]['imgPath']);
+      print("please update.");
+
+      // デコードしたbytesをそのまま保存できなかった
+      //Uint8List bytes = await File((pickedFile!).path).readAsBytes();
+      //_imgController = bytes.sublist(0,100);
+      //print(_imgController!.length);
+
+      // 画像のまま保存する試み
+      // (1)ローカルに保存
+      // ユーザビリティは低いがBASE64をそのまま打ち込むよりは推奨
+      var bytes = File((pickedFile!).path).readAsBytesSync();
+      Directory appDocDir = await getApplicationDocumentsDirectory();
+      String _appDocPath = appDocDir.path;
+      String saveFilePath = "$_appDocPath/00${_memo[id]['id']}_img.png";
+
+      // (2)image/に保存
+      // 失敗
+      //String saveFilePath = "images/ID${_memo[id]['id']}_img.png";
+
+      var saveFile = File(saveFilePath);
+      saveFile.writeAsBytesSync(bytes);
     } catch (e) {
-      debugPrint("Error");
-      return "";
+      print(e);
+      //debugPrint("Error");
     }
   }
 
@@ -172,7 +193,8 @@ class _HomePageState extends State<TimeLine> {
   void popupMenuSelected(Menu selectedMenu, index) {
     switch (selectedMenu) {
       case Menu.image:
-        _image_picker();
+        // ここに非同期処理を書くと動かない。なぜ？
+        _imagePicker(index);
         break;
       case Menu.edit:
         _showForm(_memo[index]['id']);
@@ -207,8 +229,16 @@ class _HomePageState extends State<TimeLine> {
     }
   }
 
+  Future<void> _rootChecker() async {
+    Directory appDocDir = await await getApplicationDocumentsDirectory();
+    _appDocPath = appDocDir.path;
+    //print(_appDocPath);
+  }
+
   @override
   Widget build(BuildContext context) {
+    _rootChecker();
+    print(_appDocPath);
     return Scaffold(
       //ヘッダー
       appBar: Header(),
@@ -220,52 +250,79 @@ class _HomePageState extends State<TimeLine> {
           : ListView.builder(
               itemCount: _memo.length,
               itemBuilder: (context, index) => Card(
-                color: Color.fromARGB(255, 255, 255, 255),
-                margin: const EdgeInsets.all(3),
-                child: ListTile(
-                  // タグに応じてアイコンを変更
-                  leading: Icon(
-                    _memo[index]['tag'] == "Get up"
-                        ? Icons.sunny
-                        : _memo[index]['tag'] == "Going to bed"
-                            ? Icons.airline_seat_individual_suite
-                            : _memo[index]['tag'] == "Exercise"
-                                ? Icons.fitness_center
-                                : Icons.insert_emoticon,
-                    size: 20,
-                  ),
-                  // 日記本文
-                  title: Text(_memo[index]['diary']),
-                  // 投稿日時
-                  subtitle: Text(_memo[index]['createdAt']),
-                  // ポップアップメニュー
-                  trailing: PopupMenuButton<Menu>(
-                      onSelected: (Menu item) {
-                        popupMenuSelected(item, index);
-                      },
-                      itemBuilder: (BuildContext context) =>
-                          <PopupMenuEntry<Menu>>[
-                            const PopupMenuItem<Menu>(
-                              value: Menu.image,
-                              child: ListTile(
-                                  leading: Icon(Icons.image),
-                                  title: Text("image")),
+                  color: Color.fromARGB(255, 255, 255, 255),
+                  margin: const EdgeInsets.all(8),
+                  child: Column(children: [
+                    ListTile(
+                      // タグに応じてアイコンを変更
+                      leading: Icon(
+                        _memo[index]['tag'] == "Get up"
+                            ? Icons.sunny
+                            : _memo[index]['tag'] == "Going to bed"
+                                ? Icons.airline_seat_individual_suite
+                                : _memo[index]['tag'] == "Exercise"
+                                    ? Icons.fitness_center
+                                    : Icons.insert_emoticon,
+                        size: 20,
+                      ),
+                      // 日記本文
+                      title: Text(_memo[index]['diary']),
+                      // 投稿日時
+                      subtitle: Text(_memo[index]['createdAt']),
+                      // ポップアップメニュー
+                      trailing: PopupMenuButton<Menu>(
+                          onSelected: (Menu item) {
+                            popupMenuSelected(item, index);
+                          },
+                          itemBuilder: (BuildContext context) =>
+                              <PopupMenuEntry<Menu>>[
+                                const PopupMenuItem<Menu>(
+                                  value: Menu.image,
+                                  child: ListTile(
+                                      leading: Icon(Icons.image),
+                                      title: Text("image")),
+                                ),
+                                const PopupMenuItem<Menu>(
+                                  value: Menu.edit,
+                                  child: ListTile(
+                                      leading: Icon(Icons.edit),
+                                      title: Text("edit")),
+                                ),
+                                const PopupMenuItem<Menu>(
+                                  value: Menu.delete,
+                                  child: ListTile(
+                                      leading: Icon(Icons.delete),
+                                      title: Text("delete")),
+                                ),
+                              ]),
+                    ),
+                    Stack(
+                      children: [
+                        Ink.image(
+                          //image: const NetworkImage(
+                          //  'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1327&q=80',
+                          //),
+                          image: (Image.file(File("$_appDocPath/004_img.png")))
+                              .image,
+                          height: 240,
+                          fit: BoxFit.cover,
+                        ),
+                        const Positioned(
+                          bottom: 16,
+                          right: 16,
+                          left: 16,
+                          child: Text(
+                            'I got it!!!!!!!!!',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: 24,
                             ),
-                            const PopupMenuItem<Menu>(
-                              value: Menu.edit,
-                              child: ListTile(
-                                  leading: Icon(Icons.edit),
-                                  title: Text("edit")),
-                            ),
-                            const PopupMenuItem<Menu>(
-                              value: Menu.delete,
-                              child: ListTile(
-                                  leading: Icon(Icons.delete),
-                                  title: Text("delete")),
-                            ),
-                          ]),
-                ),
-              ),
+                          ),
+                        ),
+                      ],
+                    )
+                  ])),
             ),
       // 日記投稿ボタン(削除予定？)
       floatingActionButton: FloatingActionButton(
