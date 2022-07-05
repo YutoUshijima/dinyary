@@ -299,12 +299,12 @@ class _HomePageState extends State<TimeLine> {
                     Stack(
                       children: [
                         Ink.image(
-                          //image: const NetworkImage(
-                          //  'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1327&q=80',
-                          //),
-                          image: (Image.file(File(
-                                  "$_appDocPath/00${_memo[index]['id']}_img.png")))
-                              .image,
+                          image: const NetworkImage(
+                            'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1327&q=80',
+                          ),
+                          //image: (Image.file(File(
+                          //        "$_appDocPath/00${_memo[index]['id']}_img.png")))
+                          //    .image,
                           height: 240,
                           fit: BoxFit.cover,
                         ),
