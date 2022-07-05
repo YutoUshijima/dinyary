@@ -1,9 +1,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.dinyary">
+    <!--追加_map-->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
    <application
         android:label="dinyary"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+        <!--追加_map-->
+        <meta-data
+           android:name="com.google.android.geo.API_KEY"
+           android:value="AIzaSyCtaRVwtOhGlrYvOAJ1MWfieo6WKhcJN0U"/>
         <activity
             android:name=".MainActivity"
             android:exported="true"
