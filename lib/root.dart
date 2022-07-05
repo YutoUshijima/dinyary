@@ -41,7 +41,7 @@ class _RootWidgetState extends State<RootWidget> {
   // === 追加部分 ===
   var _routes = [
     TimeLine(),
-    Map(),
+    Map_view(),
     Calendar(),
     Analysis(),
     Game(),
