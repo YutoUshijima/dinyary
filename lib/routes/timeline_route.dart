@@ -9,6 +9,7 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:geolocator/geolocator.dart';
 
 class TimeLine extends StatefulWidget {
   const TimeLine({Key? key}) : super(key: key);
@@ -26,6 +27,8 @@ class _HomePageState extends State<TimeLine> {
   bool _isLoading = true;
   String? _tagController = "Others";
   int _imgController = 0;
+  String _latController = "0";
+  String _lngController = "0";
   String? newValue = "1";
   String _selectedMenu = '';
   String _appDocPath = "";
@@ -53,12 +56,17 @@ class _HomePageState extends State<TimeLine> {
   // 日記投稿パネル表示
   void _showForm(int? id) async {
     _imgController = 0;
+    _latController = "0";
+    _lngController = "0";
+
     if (id != null) {
       final existingJournal =
           _memo.firstWhere((element) => element['id'] == id);
       _diaryController.text = existingJournal['diary'];
       _tagController = existingJournal['tag'];
       _imgController = existingJournal['img'];
+      _latController = existingJournal['lat'];
+      _lngController = existingJournal['lng'];
       //_tagController.text = existingJournal['tag'];
     }
     showModalBottomSheet(
@@ -101,6 +109,10 @@ class _HomePageState extends State<TimeLine> {
                         value: 'Exercise',
                       ),
                       DropdownMenuItem(
+                        child: Text('Eating'),
+                        value: 'Eating',
+                      ),
+                      DropdownMenuItem(
                         child: Text('Others'),
                         value: 'Others',
                       ),
@@ -127,6 +139,8 @@ class _HomePageState extends State<TimeLine> {
                       _diaryController.text = '';
                       _tagController = 'Others';
                       _imgController = 0;
+                      _latController = "0";
+                      _lngController = "0";
                       //_tagController.text = '';
                       Navigator.of(context).pop();
                     },
@@ -139,13 +153,13 @@ class _HomePageState extends State<TimeLine> {
 
   Future<void> _addItem() async {
     await NoteViewModel.createItem(_diaryController.text, _tagController,
-        _imgController); //_tagController.text);
+        _imgController, _latController, _lngController); //_tagController.text);
     _refreshJournals();
   }
 
   Future<void> _updateItem(int id) async {
     await NoteViewModel.updateItem(id, _diaryController.text, _tagController,
-        _imgController); //_tagController.text);
+        _imgController, _latController, _lngController); //_tagController.text);
     _refreshJournals();
   }
 
@@ -167,6 +181,8 @@ class _HomePageState extends State<TimeLine> {
       _diaryController.text = existingJournal['diary'];
       _tagController = existingJournal['tag'];
       _imgController = existingJournal['img'];
+      _latController = existingJournal['lat'];
+      _lngController = existingJournal['lng'];
       //_tagController.text = existingJournal['tag'];
     }
 
@@ -200,6 +216,49 @@ class _HomePageState extends State<TimeLine> {
       setState(() {
         _imgController += 1;
       });
+
+      // 現在の位置を返す
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+
+      // 位置情報登録のためのダイアログ出力
+      await showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (_) {
+            return AlertDialog(
+              title: Text("位置情報を追加しますか？"),
+              actions: [
+                TextButton(
+                  child: Text("現在の位置情報を利用"),
+                  onPressed: () {
+                    // 北緯がプラス。南緯がマイナス
+                    print("Use your location");
+                    print("緯度: " + position.latitude.toString());
+                    _latController = position.latitude.toString();
+                    // 東経がプラス、西経がマイナス
+                    print("経度: " + position.longitude.toString());
+                    _lngController = position.longitude.toString();
+                    // 高度
+                    print("高度: " + position.altitude.toString());
+                    Navigator.pop(context);
+                  },
+                ),
+                TextButton(
+                  child: Text("カスタムされた座標を入力"),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+                TextButton(
+                  child: Text("No."),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            );
+          });
 
       _updateItem(id);
     } catch (e) {
@@ -257,7 +316,7 @@ class _HomePageState extends State<TimeLine> {
   @override
   Widget build(BuildContext context) {
     _rootChecker();
-    print(_appDocPath);
+    //print(_appDocPath);
     return Scaffold(
       //ヘッダー
       appBar: Header(),
@@ -281,13 +340,15 @@ class _HomePageState extends State<TimeLine> {
                                 ? Icons.airline_seat_individual_suite
                                 : _memo[index]['tag'] == "Exercise"
                                     ? Icons.fitness_center
-                                    : Icons.insert_emoticon,
+                                    : _memo[index]['tag'] == "Eating"
+                                        ? Icons.fastfood
+                                        : Icons.insert_emoticon,
                         size: 20,
                       ),
                       // 日記本文
                       title: Text(_memo[index]['diary']),
                       // 投稿日時
-                      subtitle: Text((_memo[index]['createdAt'])
+                      subtitle: Text((_memo[index]['lng'])
                           .toString()), //Text(_memo[index]['createdAt']),
                       // ポップアップメニュー
                       trailing: PopupMenuButton<Menu>(
