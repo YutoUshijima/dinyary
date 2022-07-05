@@ -25,6 +25,7 @@ class _HomePageState extends State<TimeLine> {
   // 初期値
   bool _isLoading = true;
   String? _tagController = "Others";
+  int _imgController = 0;
   String? newValue = "1";
   String _selectedMenu = '';
   String _appDocPath = "";
@@ -51,11 +52,13 @@ class _HomePageState extends State<TimeLine> {
 
   // 日記投稿パネル表示
   void _showForm(int? id) async {
+    _imgController = 0;
     if (id != null) {
       final existingJournal =
           _memo.firstWhere((element) => element['id'] == id);
       _diaryController.text = existingJournal['diary'];
       _tagController = existingJournal['tag'];
+      _imgController = existingJournal['img'];
       //_tagController.text = existingJournal['tag'];
     }
     showModalBottomSheet(
@@ -123,6 +126,7 @@ class _HomePageState extends State<TimeLine> {
                       }
                       _diaryController.text = '';
                       _tagController = 'Others';
+                      _imgController = 0;
                       //_tagController.text = '';
                       Navigator.of(context).pop();
                     },
@@ -134,14 +138,14 @@ class _HomePageState extends State<TimeLine> {
   }
 
   Future<void> _addItem() async {
-    await NoteViewModel.createItem(
-        _diaryController.text, _tagController); //_tagController.text);
+    await NoteViewModel.createItem(_diaryController.text, _tagController,
+        _imgController); //_tagController.text);
     _refreshJournals();
   }
 
   Future<void> _updateItem(int id) async {
-    await NoteViewModel.updateItem(
-        id, _diaryController.text, _tagController); //_tagController.text);
+    await NoteViewModel.updateItem(id, _diaryController.text, _tagController,
+        _imgController); //_tagController.text);
     _refreshJournals();
   }
 
@@ -157,12 +161,20 @@ class _HomePageState extends State<TimeLine> {
 
   // 画像インポートのための関数
   Future<void> _imagePicker(int id) async {
+    if (id != null) {
+      final existingJournal =
+          _memo.firstWhere((element) => element['id'] == id);
+      _diaryController.text = existingJournal['diary'];
+      _tagController = existingJournal['tag'];
+      _imgController = existingJournal['img'];
+      //_tagController.text = existingJournal['tag'];
+    }
+
     // ギャラリーの1枚目を選択するとバグるので注意!!!
     var pickedFile = await picker.pickImage(source: ImageSource.gallery);
     try {
       // ファイルをギャラリからインポート
-      print(_memo[id]['imgPath']);
-      print("please update.");
+      //print("please update.");
 
       // デコードしたbytesをそのまま保存できなかった
       //Uint8List bytes = await File((pickedFile!).path).readAsBytes();
@@ -175,7 +187,8 @@ class _HomePageState extends State<TimeLine> {
       var bytes = File((pickedFile!).path).readAsBytesSync();
       Directory appDocDir = await getApplicationDocumentsDirectory();
       String _appDocPath = appDocDir.path;
-      String saveFilePath = "$_appDocPath/00${_memo[id]['id']}_img.png";
+      String saveFilePath =
+          "$_appDocPath/00${id}_00${_imgController + 1}_img.png";
 
       // (2)image/に保存
       // 失敗
@@ -183,6 +196,12 @@ class _HomePageState extends State<TimeLine> {
 
       var saveFile = File(saveFilePath);
       saveFile.writeAsBytesSync(bytes);
+
+      setState(() {
+        _imgController += 1;
+      });
+
+      _updateItem(id);
     } catch (e) {
       print(e);
       //debugPrint("Error");
@@ -194,7 +213,7 @@ class _HomePageState extends State<TimeLine> {
     switch (selectedMenu) {
       case Menu.image:
         // ここに非同期処理を書くと動かない。なぜ？
-        _imagePicker(index);
+        _imagePicker(_memo[index]['id']);
         break;
       case Menu.edit:
         _showForm(_memo[index]['id']);
@@ -268,7 +287,8 @@ class _HomePageState extends State<TimeLine> {
                       // 日記本文
                       title: Text(_memo[index]['diary']),
                       // 投稿日時
-                      subtitle: Text(_memo[index]['createdAt']),
+                      subtitle: Text((_memo[index]['createdAt'])
+                          .toString()), //Text(_memo[index]['createdAt']),
                       // ポップアップメニュー
                       trailing: PopupMenuButton<Menu>(
                           onSelected: (Menu item) {
@@ -299,13 +319,17 @@ class _HomePageState extends State<TimeLine> {
                     Stack(
                       children: [
                         Ink.image(
-                          image: const NetworkImage(
-                            'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1327&q=80',
-                          ),
-                          //image: (Image.file(File(
-                          //        "$_appDocPath/00${_memo[index]['id']}_img.png")))
-                          //    .image,
-                          height: 240,
+                          image: _memo[index]['img'] == 0
+                              // 画像が選択されていない場合は適当な白い画像を表示(ほとんど見えない)
+                              ? const NetworkImage(
+                                  'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/White_flag_of_surrender.svg/512px-White_flag_of_surrender.svg.png',
+                                  //'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1327&q=80',
+                                )
+                              // 画像が追加されている場合はローカルストレージから選択
+                              : (Image.file(File(
+                                      "$_appDocPath/00${_memo[index]['id']}_00${_memo[index]['img']}_img.png")))
+                                  .image,
+                          height: _memo[index]['img'] == 0 ? 1 : 200,
                           fit: BoxFit.cover,
                         ),
                         const Positioned(
