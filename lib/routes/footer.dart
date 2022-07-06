@@ -1,3 +1,9 @@
+// 新しいフッター表示用ウィジェット
+// これを毎回bottomNavigationBarに入れてください
+
+// パラメータ"pageid"によってアクティブなアイコンを管理します
+// pageidの値はリスト"_routes"のインデックスに一致するよう記入してください
+
 import 'package:flutter/material.dart';
 
 // == 作成したWidget をインポート ==================

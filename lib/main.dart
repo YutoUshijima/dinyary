@@ -23,6 +23,7 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData(
               primaryColor: Colors.blueGrey[900],
       ),
+      // 最初の画面をタイムラインに固定
       home: TimeLine(),
     );
   }

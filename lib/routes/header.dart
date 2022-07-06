@@ -14,6 +14,7 @@ class Header extends StatelessWidget with PreferredSizeWidget {
       ),
       // ignore: prefer_const_literals_to_create_immutables
       actions: [
+        // 特に使わなさそうなので削除
         //Padding(
         //    padding: const EdgeInsets.all(8.0),
         //    child: IconButton(
