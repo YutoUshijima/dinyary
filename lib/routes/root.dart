@@ -2,13 +2,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 // == 作成したWidget をインポート ==================
-import 'routes/timeline_route.dart';
-import 'routes/map_route.dart';
-import 'routes/calendar_route.dart';
-import 'routes/analysis_route.dart';
+import 'timeline_route.dart';
+import 'map_route.dart';
+import 'calendar_route.dart';
+import 'analysis_route.dart';
 //import 'routes/home_route.dart';
 //import 'routes/user_route.dart';
-import 'routes/game_route.dart';
+import 'game_route.dart';
 // =============================================
 
 class RootWidget extends StatefulWidget {

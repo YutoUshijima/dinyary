@@ -1,6 +1,8 @@
 //import 'package:dinyary/routes/home_route.dart';
 import 'dart:typed_data';
 
+import "footer.dart";
+
 import 'package:dinyary/routes/header.dart';
 import 'package:flutter/material.dart';
 //import 'header.dart';
@@ -320,6 +322,8 @@ class _HomePageState extends State<TimeLine> {
     return Scaffold(
       //ヘッダー
       appBar: Header(),
+      bottomNavigationBar: Footer(
+        pageid: 0),
       // 日記の描画
       body: _isLoading
           ? const Center(
@@ -348,7 +352,7 @@ class _HomePageState extends State<TimeLine> {
                       // 日記本文
                       title: Text(_memo[index]['diary']),
                       // 投稿日時
-                      subtitle: Text((_memo[index]['lng'])
+                      subtitle: Text((_memo[index]['createdAt'])
                           .toString()), //Text(_memo[index]['createdAt']),
                       // ポップアップメニュー
                       trailing: PopupMenuButton<Menu>(
