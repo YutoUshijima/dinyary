@@ -1,9 +1,11 @@
 //import 'package:dinyary/routes/home_route.dart';
 import 'dart:typed_data';
 
+import "footer.dart";
 import 'package:dinyary/routes/header.dart';
 import 'package:flutter/material.dart';
 //import 'header.dart';
+
 import 'NoteViewModel.dart';
 import 'dart:io';
 import 'dart:convert';
@@ -18,6 +20,7 @@ class TimeLine extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
+// ポップアップメニュー一覧
 enum Menu { image, edit, delete }
 
 class _HomePageState extends State<TimeLine> {
@@ -30,7 +33,7 @@ class _HomePageState extends State<TimeLine> {
   String _latController = "0";
   String _lngController = "0";
   String? newValue = "1";
-  String _selectedMenu = '';
+  // String _selectedMenu = '';
   String _appDocPath = "";
   final TextEditingController _diaryController = TextEditingController();
   //final TextEditingController _tagController = TextEditingController();
@@ -39,6 +42,7 @@ class _HomePageState extends State<TimeLine> {
 
   //var _isSelectedItem = "Others";
 
+  // フォームの再描画
   void _refreshJournals() async {
     final data = await NoteViewModel.getNotes();
     setState(() {
@@ -53,12 +57,13 @@ class _HomePageState extends State<TimeLine> {
     _refreshJournals();
   }
 
-  // 日記投稿パネル表示
+  // 日記を書くところを表示
   void _showForm(int? id) async {
     _imgController = 0;
     _latController = "0";
     _lngController = "0";
 
+    // 既存の投稿編集の場合はそれぞれの値を代入
     if (id != null) {
       final existingJournal =
           _memo.firstWhere((element) => element['id'] == id);
@@ -69,6 +74,8 @@ class _HomePageState extends State<TimeLine> {
       _lngController = existingJournal['lng'];
       //_tagController.text = existingJournal['tag'];
     }
+
+    // 編集画面表示
     showModalBottomSheet(
         context: context,
         elevation: 5,
@@ -151,12 +158,14 @@ class _HomePageState extends State<TimeLine> {
             ));
   }
 
+  // アイテムの追加
   Future<void> _addItem() async {
     await NoteViewModel.createItem(_diaryController.text, _tagController,
         _imgController, _latController, _lngController); //_tagController.text);
     _refreshJournals();
   }
 
+  // アイテムの編集
   Future<void> _updateItem(int id) async {
     await NoteViewModel.updateItem(id, _diaryController.text, _tagController,
         _imgController, _latController, _lngController); //_tagController.text);
@@ -247,11 +256,12 @@ class _HomePageState extends State<TimeLine> {
                 TextButton(
                   child: Text("カスタムされた座標を入力"),
                   onPressed: () {
+                    // 要編集
                     Navigator.pop(context);
                   },
                 ),
                 TextButton(
-                  child: Text("No."),
+                  child: Text("座標を追加しない"),
                   onPressed: () {
                     Navigator.pop(context);
                   },
@@ -307,6 +317,7 @@ class _HomePageState extends State<TimeLine> {
     }
   }
 
+  // 端末内のアプリ用ストレージの絶対パスを取得
   Future<void> _rootChecker() async {
     Directory appDocDir = await await getApplicationDocumentsDirectory();
     _appDocPath = appDocDir.path;
@@ -320,6 +331,8 @@ class _HomePageState extends State<TimeLine> {
     return Scaffold(
       //ヘッダー
       appBar: Header(),
+      bottomNavigationBar: Footer(
+        pageid: 0),
       // 日記の描画
       body: _isLoading
           ? const Center(
@@ -348,7 +361,7 @@ class _HomePageState extends State<TimeLine> {
                       // 日記本文
                       title: Text(_memo[index]['diary']),
                       // 投稿日時
-                      subtitle: Text((_memo[index]['lng'])
+                      subtitle: Text((_memo[index]['createdAt'])
                           .toString()), //Text(_memo[index]['createdAt']),
                       // ポップアップメニュー
                       trailing: PopupMenuButton<Menu>(
@@ -410,7 +423,7 @@ class _HomePageState extends State<TimeLine> {
                     )
                   ])),
             ),
-      // 日記投稿ボタン(削除予定？)
+      // 日記投稿ボタン
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
         onPressed: () => _showForm(null),
