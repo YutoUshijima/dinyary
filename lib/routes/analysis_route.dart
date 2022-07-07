@@ -1,19 +1,176 @@
 import 'package:flutter/material.dart';
 import 'analysis2_route.dart';
+import 'NoteViewModel.dart';
 import 'header.dart';
 
-const kColorPurple = Color(0xFF8337EC);
-const kColorPink = Color(0xFFFF006F);
-const kColorIndicatorBegin = kColorPink;
-const kColorIndicatorEnd = kColorPurple;
 const kColorTitle = Color(0xFF616161);
-const kColorText = Color(0xFF9E9E9E);
-const kElevation = 4.0;
 
-class Analysis extends StatelessWidget {
-  // <- (※1)
+class Analysis extends StatefulWidget {
+  const Analysis({Key? key}) : super(key: key);
+
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State{
+  List<Map<String, dynamic>> _memo = [];
+  bool _isLoading = true;
+
+  var sleepList = [];
+  var morningList = [];
+  var dayList = [];
+  var weekday = [];
+
+  void _refreshJournals() async {
+    final data = await NoteViewModel.getNotes();
+    setState(() {
+      _memo = data;
+      _isLoading = false;
+
+      weekday = ['(月)', '(月)', '(火)', '(水)', '(木)', '(金)', '(土)', '(日)'];
+
+      // var sleepList = [];
+      sleepList.add(DateTime(2022,7,6,3,20));
+      sleepList.add(DateTime(2022,7,6,22,33));
+      sleepList.add(DateTime(2022,7,7,23));
+      sleepList.add(DateTime(2022,7,8,20));
+      sleepList.add(DateTime(2022,7,9,3,20));
+      sleepList.add(DateTime(2022,7,9,22,33));
+      sleepList.add(DateTime(2022,7,10,23));
+      sleepList.add(DateTime(2022,7,11,20));
+      sleepList.add(DateTime(2022,7,12,3,20));
+      sleepList.add(DateTime(2022,7,12,22,33));
+      sleepList.add(DateTime(2022,7,13,23));
+      sleepList.add(DateTime(2022,7,14,20));
+
+      // var morningList = [];
+      morningList.add(DateTime(2022,7,6,10));
+      morningList.add(DateTime(2022,7,7,6,30));
+      morningList.add(DateTime(2022,7,8,20,22));
+      morningList.add(DateTime(2022,7,9,10));
+      morningList.add(DateTime(2022,7,10,6,30));
+      morningList.add(DateTime(2022,7,11,20,22));
+      morningList.add(DateTime(2022,7,12,10));
+      morningList.add(DateTime(2022,7,13,6,30));
+      morningList.add(DateTime(2022,7,14,20,22));
+
+
+      // var dayList = [];
+      for(var i in sleepList + morningList){
+        dayList.add(DateTime(i.year, i.month, i.day));
+      }
+      dayList = dayList.toSet().toList();
+
+      for(var i in dayList){
+        print('======================================');
+        print(i);
+        var sleep = [];
+        var morning = [];
+        for(var i2 in sleepList){
+          if(i.year==i2.year && i.month==i2.month && i.day==i2.day){
+            sleep.add(i2);
+          }
+          // print(i.add(Duration(days: 1)));
+          // print(i2);
+          // print((i.add(Duration(days: 1))).isBefore(i2));
+          if((i.add(Duration(days: 1))).isBefore(i2)){
+            break;
+          }
+        }
+
+        for(var i2 in morningList){
+          if(i.year==i2.year && i.month==i2.month && i.day==i2.day){
+            morning.add(i2);
+          }
+          // print(i.add(Duration(days: 1)));
+          // print(i2);
+          // print((i.add(Duration(days: 1))).isBefore(i2));
+          if((i.add(Duration(days: 1))).isBefore(i2)){
+            break;
+          }
+        }
+        print(sleep);
+        print(morning);
+        print('-----------------');
+
+
+        var memori = [0,0,1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0,10,0,11,0,12,0,13,0,14,0,15,0,16,0,17,0,18,0,19,0,20,0,21,0,22,0,23,0];
+        var graph = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+        var end = 48;
+
+        if(sleep.isEmpty){
+          if(morning.isEmpty){
+            print('double_null');
+          }else{
+            print('sleep_null');
+            end = morning[morning.length-1].hour*2 + morning[morning.length-1].minute~/30;
+            for(var l=0; l<end; l++){
+              graph[l] = 1;
+            }
+          }
+        }else{
+          if(morning.isNotEmpty){
+            print('not_null');
+            if(sleep[0].isAfter(morning[0])){
+              sleep.insert(0, i);
+              print('new_sleep');
+              print(sleep);
+            }
+
+            for(var j in sleep){
+              end = 48;
+              for(var k in morning){
+                if(j.isBefore(k)){
+                  end = k.hour * 2 + k.minute~/30;
+                  print('end = k.hour * 2 + k.minute~/30');
+                  print(end);
+                  break;
+                }
+              }
+              print('j.hour*2+j.minute~/30');
+              print(j.hour*2+j.minute~/30);
+              for(var l=j.hour*2+j.minute~/30; l<end; l++){
+                graph[l] = 1;
+              }
+            }
+          }else{
+            print('morning_null');
+            for(var j in sleep){
+              print('j.hour*2+j.minute~/30');
+              print(j.hour*2+j.minute~/30);
+              for(var l=j.hour*2+j.minute~/30; l<end; l++){
+                graph[l] = 1;
+              }
+            }
+          }
+        }
+        print(memori);
+        print(graph);
+      }
+
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _refreshJournals();
+  }
+
   @override
   Widget build(BuildContext context) {
+    var getUpTimeIterable = _memo.where((element) => element['tag']=='Get up');
+    var getUpTimeList = [];
+    for(var i in getUpTimeIterable){
+      getUpTimeList.add(i);
+    }
+    var sleepTimeIterable = _memo.where((element) => element['tag']=='Going to bed');
+    var sleepTimeList = [];
+    for(var i in sleepTimeIterable){
+      sleepTimeList.add(i);
+    }
+    print(getUpTimeList);
+    print(sleepTimeList);
     return Scaffold(
       appBar: AppBar(
         leading: Padding(
@@ -39,7 +196,7 @@ class Analysis extends StatelessWidget {
               width: double.infinity,
               decoration: BoxDecoration(color: Colors.blue),
               child: Text(
-                '　　　　　　18・・21・・0 ・・3 ・・6 ・・9 ・・12・・15・・',
+                '　　　　　　0 ・・3 ・・6 ・・9 ・・12・・15・・18・・21・・',
                 style: TextStyle(color: Colors.white, fontSize: 12),
               ),
             )),
@@ -47,151 +204,147 @@ class Analysis extends StatelessWidget {
         centerTitle: true,
         elevation: 0.0,
       ),
-      body: Padding(
-          padding: const EdgeInsets.all(8),
-          child: ListView(children: <Widget>[
-            Center(child: OptimizerButtons()),
-            ListTile(
-              leading: Text("7/1\n(金)", style: TextStyle(fontSize: 15)),
-              subtitle: _Body(8, 21),
-            ),
-            Divider(
-              height: 2,
-              thickness: 1,
-              color: Colors.black,
-            ),
-            ListTile(
-              leading: Text("7/2\n(土)", style: TextStyle(fontSize: 15)),
-              subtitle: _Body(6, 30),
-            ),
-            Divider(
-              height: 2,
-              thickness: 1,
-              color: Colors.black,
-            ),
-            ListTile(
-              leading: Text("7/3\n(日)", style: TextStyle(fontSize: 15)),
-              subtitle: _Body(4, 10),
-            ),
-            Divider(
-              height: 2,
-              thickness: 1,
-              color: Colors.black,
-            ),
-            ListTile(
-              leading: Text("7/4\n(月)", style: TextStyle(fontSize: 15)),
-              subtitle: _Body(8, 17),
-            ),
-            Divider(
-              height: 2,
-              thickness: 1,
-              color: Colors.black,
-            ),
-            ListTile(
-              leading: Text("7/5\n(火)", style: TextStyle(fontSize: 15)),
-              subtitle: _Body(2, 15),
-            ),
-            Divider(
-              height: 2,
-              thickness: 1,
-              color: Colors.black,
-            ),
-            ListTile(
-              leading: Text("7/6\n(水)", style: TextStyle(fontSize: 15)),
-              subtitle: _Body(4, 10),
-            ),
-            Divider(
-              height: 2,
-              thickness: 1,
-              color: Colors.black,
-            ),
-            ListTile(
-              leading: Text("7/7\n(木)", style: TextStyle(fontSize: 15)),
-              subtitle: _Body(4, 10),
-            ),
-            Divider(
-              height: 2,
-              thickness: 1,
-              color: Colors.black,
-            ),
-            ListTile(
-              title: Text("7/3"),
-              subtitle: _Body(5, 30),
-            ),
-            Divider(
-              height: 2,
-              thickness: 1,
-              color: Colors.black,
-            ),
-            ListTile(
-              title: Text("7/4"),
-              subtitle: _Body(11, 25),
-            ),
-            Divider(
-              height: 2,
-              thickness: 1,
-              color: Colors.black,
-            ),
-            ListTile(
-              title: Text("7/5"),
-              subtitle: _Body(8, 21),
-            ),
-            Divider(
-              height: 2,
-              thickness: 1,
-              color: Colors.black,
-            ),
-            ListTile(
-              title: Text("7/6"),
-              subtitle: _Body(5, 30),
-            ),
-            Divider(
-              height: 2,
-              thickness: 1,
-              color: Colors.black,
-            ),
-            ListTile(
-              title: Text("7/7"),
-              subtitle: _Body(11, 25),
-            ),
-            Divider(
-              height: 2,
-              thickness: 1,
-              color: Colors.black,
-            ),
-          ])
-          // child: Column(
-          //   children: [
-          //     OptimizerButtons(),
-          //     PostList(),
-          //     // BarChart(
-          //       // BarChartData(
-          //       //   borderData: FlBorderData(
-          //       //       border: const Border(
-          //       //         top: BorderSide.none,
-          //       //         right: BorderSide.none,
-          //       //         left: BorderSide(width: 1),
-          //       //         bottom: BorderSide(width: 1),
-          //       //       )),
-          //       //     groupsSpace: 4,
-          //       //     barGroups: [
-          //       //       BarChartGroupData(x: 1, barRods: [
-          //       //         BarChartRodData(toY: 10, width: 15),
-          //       //       ]),
-          //       //       BarChartGroupData(x: 2, barRods: [
-          //       //         BarChartRodData(toY: 10, width: 15),
-          //       //       ]),
-          //       //       BarChartGroupData(x: 3, barRods: [
-          //       //         BarChartRodData(toY: 10, width: 15),
-          //       //       ]),
-          //       //       BarChartGroupData(x: 4, barRods: [
-          //       //         BarChartRodData(toY: 21, width: 15),
-          //       //       ]),
-          //       //     ]),
-          //       // )
-          //   ]
-          // )
+      body: _isLoading
+          ? const Center(
+        child: CircularProgressIndicator(),
+      )
+      //     : ListView.builder(
+      //   itemCount: getUpTimeList.length,
+      //   itemBuilder: (context, index) {
+      //     String a = getUpTimeList[index]['createdAt'];
+      //     String b = sleepTimeList[index]['createdAt'];
+      //     DateTime getUpTime = DateTime.parse(a);
+      //     DateTime sleepTime = DateTime.parse(b);
+      //
+      //
+      //     for(var i in sleepTimeList){
+      //       String c = i['createdAt'];
+      //       DateTime sleepTime2 = DateTime.parse(c);
+      //       print('sleeptime');
+      //       print(sleepTime2);
+      //       if(sleepTime2.difference(getUpTime).inHours>=0){
+      //         print('for');
+      //       }else{
+      //         print('else');
+      //       }
+      //
+      //     }
+      //     return Text('Get Up at:'+a+'¥n Sleeping at:'+b);
+      //   },// return Text(_memo[index]['tag']=="Get up"?"Get Up at :"+_memo[index]['createdAt']:a);
+      // ),
+
+          : ListView(children: [
+        Center(child: OptimizerButtons()),
+        Flexible(
+          child: ListView.builder(
+            physics: NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            itemCount: dayList.length,
+            itemBuilder: (context, index) {
+              print('======================================');
+              var day = dayList[index];
+              print('day');
+              print(day);
+
+              var sleep = [];
+              var morning = [];
+              for(var i2 in sleepList){
+                if(day.year==i2.year && day.month==i2.month && day.day==i2.day){
+                  sleep.add(i2);
+                }
+                // print(i.add(Duration(days: 1)));
+                // print(i2);
+                // print((i.add(Duration(days: 1))).isBefore(i2));
+                if((day.add(Duration(days: 1))).isBefore(i2)){
+                  break;
+                }
+              }
+              for(var i2 in morningList){
+                if(day.year==i2.year && day.month==i2.month && day.day==i2.day){
+                  morning.add(i2);
+                }
+                // print(i.add(Duration(days: 1)));
+                // print(i2);
+                // print((i.add(Duration(days: 1))).isBefore(i2));
+                if((day.add(Duration(days: 1))).isBefore(i2)){
+                  break;
+                }
+              }
+              print(sleep);
+              print(morning);
+              print('-----------------');
+
+
+              var memori = [0,0,1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0,10,0,11,0,12,0,13,0,14,0,15,0,16,0,17,0,18,0,19,0,20,0,21,0,22,0,23,0];
+              var graph = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+              var end = 48;
+
+              if(sleep.isEmpty){
+                if(morning.isEmpty){
+                  print('double_null');
+                }else{
+                  print('sleep_null');
+                  end = morning[morning.length-1].hour*2 + morning[morning.length-1].minute~/30;
+                  for(var l=0; l<end; l++){
+                    graph[l] = 1;
+                  }
+                }
+              }else{
+                if(morning.isNotEmpty){
+                  print('not_null');
+                  if(sleep[0].isAfter(morning[0])){
+                    sleep.insert(0, day);
+                    print('new_sleep');
+                    print(sleep);
+                  }
+
+                  for(var j in sleep){
+                    end = 48;
+                    for(var k in morning){
+                      if(j.isBefore(k)){
+                        end = k.hour * 2 + k.minute~/30;
+                        print('end = k.hour * 2 + k.minute~/30');
+                        print(end);
+                        break;
+                      }
+                    }
+                    print('j.hour*2+j.minute~/30');
+                    print(j.hour*2+j.minute~/30);
+                    for(var l=j.hour*2+j.minute~/30; l<end; l++){
+                      graph[l] = 1;
+                    }
+                  }
+                }else{
+                  print('morning_null');
+                  for(var j in sleep){
+                    print('j.hour*2+j.minute~/30');
+                    print(j.hour*2+j.minute~/30);
+                    for(var l=j.hour*2+j.minute~/30; l<end; l++){
+                      graph[l] = 1;
+                    }
+                  }
+                }
+              }
+              print(memori);
+              print(graph);
+              return Column(
+                children: [
+                  ListTile(
+                    leading: Text(day.month.toString()+'/'+day.day.toString()+'\n'+weekday[day.weekday], style: TextStyle(fontSize: 16)),
+                    subtitle: _Body(graph),
+                  ),
+                  Divider(
+                    height: 2,
+                    thickness: 1,
+                    color: Colors.black,
+                  ),
+                ],
+              );
+            },
           ),
+        ),
+      ],
+      ),
     );
   }
 }
@@ -250,56 +403,9 @@ class OptimizerButtons extends StatelessWidget {
   }
 }
 
-class _PostsHeader extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          flex: 1,
-          child: ListTile(
-            leading: ClipOval(
-              child: Container(
-                color: Colors.grey[300],
-                width: 48,
-                height: 48,
-                child: Icon(
-                  Icons.storage,
-                  color: Colors.grey[800],
-                ),
-              ),
-            ),
-            title: Text('Posts'),
-            subtitle: Text('20 Posts'),
-          ),
-        ),
-        Expanded(
-          flex: 1,
-          child: ListTile(
-            leading: ClipOval(
-              child: Container(
-                color: Colors.grey[300],
-                width: 48,
-                height: 48,
-                child: Icon(
-                  Icons.style,
-                  color: Colors.grey[800],
-                ),
-              ),
-            ),
-            title: Text('All Types'),
-            subtitle: Text(''),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
 class _Body extends StatelessWidget {
-  double start_time = 1;
-  double end_time = 1;
-  _Body(this.start_time, this.end_time);
+  List graph;
+  _Body(this.graph);
 
   @override
   Widget build(BuildContext context) {
@@ -308,7 +414,7 @@ class _Body extends StatelessWidget {
         width: 400,
         height: 75,
         child: CustomPaint(
-          painter: _SamplePainter(start_time, end_time),
+          painter: _SamplePainter(graph),
         ),
       ),
     ]);
@@ -316,24 +422,23 @@ class _Body extends StatelessWidget {
 }
 
 class _SamplePainter extends CustomPainter {
-  double start_time = 1;
-  double end_time = 1;
-  _SamplePainter(this.start_time, this.end_time);
+  List graph;
+  _SamplePainter(this.graph);
 
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()..color = Colors.grey;
     paint.strokeWidth = 4;
-    for (int i = 0; i < 48; i++) {
-      if (start_time <= i && i <= end_time) {
-        paint.color = Colors.red;
-      } else {
+    for (int i = 0; i < graph.length; i++) {
+      if (graph[i]==0) {
         paint.color = Colors.grey;
+      } else {
+        paint.color = Colors.red;
       }
-      // if (i % 6 == 0) {
+      // if(i%6==0){
       //   paint.color = Colors.blue;
       // }
-      double x = i * 5.9;
+      double x = i * 5.9 + 5;
       canvas.drawLine(Offset(x, 10), Offset(x, 60), paint);
     }
   }
