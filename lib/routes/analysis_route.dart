@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'analysis2_route.dart';
 import 'NoteViewModel.dart';
 import 'header.dart';
+import 'footer.dart';
 
 const kColorTitle = Color(0xFF616161);
 
@@ -172,6 +173,8 @@ class _HomePageState extends State{
     print(getUpTimeList);
     print(sleepTimeList);
     return Scaffold(
+      bottomNavigationBar: Footer(
+        pageid: 3),
       appBar: AppBar(
         leading: Padding(
           padding: const EdgeInsets.all(8.0),
