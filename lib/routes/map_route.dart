@@ -20,6 +20,8 @@ class Map_view extends StatelessWidget {
   }
 }
 
+
+
 class MapSample extends HookWidget {
   final Completer<GoogleMapController> _mapController = Completer();
   // 現在地が取得出来ない場合の初期表示位置を百万遍に設定
@@ -53,7 +55,8 @@ class MapSample extends HookWidget {
     return Scaffold(
       body: GoogleMap(
         mapType: MapType.normal, // 航空写真などに変更する場合はこの部分をいじる
-        myLocationButtonEnabled: true, // GoogleMap の右下に表示される現在地へ移動するボタン
+        myLocationButtonEnabled: false, // GoogleMap の右下に表示される現在地へ移動するボタン
+        
         // 初期表示位置は百万遍に設定
         initialCameraPosition: CameraPosition(
           target: LatLng(_initialPosition.latitude, _initialPosition.longitude),
@@ -62,8 +65,16 @@ class MapSample extends HookWidget {
         onMapCreated: _mapController.complete,
         markers: markers.value.values.toSet(),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: ()async{_animateCamera(position);},
+        foregroundColor: Colors.blue,
+        backgroundColor:Colors.white,
+        child: Icon(Icons.my_location),
+      ),
     );
   }
+
+
 
   // 現在地を取得して状態を管理する
   Future<void> _setCurrentLocation(ValueNotifier<Position> position,
