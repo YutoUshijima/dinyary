@@ -3,7 +3,7 @@ description: A new Flutter project.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -29,12 +29,18 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  sqflite: ^2.0.2 # 追加
+  image_picker: ^0.8.5+3 # 追加
+  path_provider: ^2.0.11 #追加
+  flutter_hooks: ^0.18.2+1 #追加_map
 
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   table_calendar: ^3.0.3
+  google_maps_flutter: ^2.1.8 #追加_map
+  google_maps_flutter_web: ^0.4.0 #追加_map
 
 dev_dependencies:
   flutter_test:
@@ -62,6 +68,8 @@ flutter:
   # assets:
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
+  assets:
+    - images/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

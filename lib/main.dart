@@ -1,6 +1,7 @@
+import 'package:dinyary/routes/timeline_route.dart';
 import 'package:flutter/material.dart';
 import 'routes/header.dart'; // <- header.dart を インポート
-import 'root.dart'; // <- footer.dart をインポート
+import 'routes/root.dart'; //
 
 void main() {
  runApp(MyApp());
@@ -22,7 +23,8 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData(
               primaryColor: Colors.blueGrey[900],
       ),
-      home: RootWidget(),
+      // 最初の画面をタイムラインに固定
+      home: TimeLine(),
     );
   }
 }
