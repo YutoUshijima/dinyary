@@ -1,13 +1,19 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'analysis2_route.dart';
 import 'NoteViewModel.dart';
 import 'header.dart';
-import 'footer.dart';
+import 'analysis_route.dart';
 
+const kColorPurple = Color(0xFF8337EC);
+const kColorPink = Color(0xFFFF006F);
+const kColorIndicatorBegin = kColorPink;
+const kColorIndicatorEnd = kColorPurple;
 const kColorTitle = Color(0xFF616161);
+const kColorText = Color(0xFF9E9E9E);
+const kElevation = 4.0;
 
-class Analysis extends StatefulWidget {
-  const Analysis({Key? key}) : super(key: key);
+class Analysis2 extends StatefulWidget {
+  const Analysis2({Key? key}) : super(key: key);
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -173,18 +179,16 @@ class _HomePageState extends State{
     print(getUpTimeList);
     print(sleepTimeList);
     return Scaffold(
-      bottomNavigationBar: Footer(
-        pageid: 3),
       appBar: AppBar(
         leading: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Icon(Icons.account_circle),
         ),
         actions: [
-          // Padding(
-          //   padding: const EdgeInsets.all(8.0),
-          //   child: Icon(Icons.create_outlined),
-          // ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Icon(Icons.create_outlined),
+          ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Icon(Icons.settings),
@@ -237,117 +241,117 @@ class _HomePageState extends State{
       // ),
 
           : ListView(children: [
-        Center(child: OptimizerButtons()),
-        Flexible(
-          child: ListView.builder(
-            physics: NeverScrollableScrollPhysics(),
-            shrinkWrap: true,
-            itemCount: dayList.length,
-            itemBuilder: (context, index) {
-              print('======================================');
-              var day = dayList[index];
-              print('day');
-              print(day);
+              Center(child: OptimizerButtons()),
+              Flexible(
+                child: ListView.builder(
+                  physics: NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  itemCount: dayList.length,
+                  itemBuilder: (context, index) {
+                    print('======================================');
+                    var day = dayList[index];
+                    print('day');
+                    print(day);
 
-              var sleep = [];
-              var morning = [];
-              for(var i2 in sleepList){
-                if(day.year==i2.year && day.month==i2.month && day.day==i2.day){
-                  sleep.add(i2);
-                }
-                // print(i.add(Duration(days: 1)));
-                // print(i2);
-                // print((i.add(Duration(days: 1))).isBefore(i2));
-                if((day.add(Duration(days: 1))).isBefore(i2)){
-                  break;
-                }
-              }
-              for(var i2 in morningList){
-                if(day.year==i2.year && day.month==i2.month && day.day==i2.day){
-                  morning.add(i2);
-                }
-                // print(i.add(Duration(days: 1)));
-                // print(i2);
-                // print((i.add(Duration(days: 1))).isBefore(i2));
-                if((day.add(Duration(days: 1))).isBefore(i2)){
-                  break;
-                }
-              }
-              print(sleep);
-              print(morning);
-              print('-----------------');
-
-
-              var memori = [0,0,1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0,10,0,11,0,12,0,13,0,14,0,15,0,16,0,17,0,18,0,19,0,20,0,21,0,22,0,23,0];
-              var graph = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-              var end = 48;
-
-              if(sleep.isEmpty){
-                if(morning.isEmpty){
-                  print('double_null');
-                }else{
-                  print('sleep_null');
-                  end = morning[morning.length-1].hour*2 + morning[morning.length-1].minute~/30;
-                  for(var l=0; l<end; l++){
-                    graph[l] = 1;
-                  }
-                }
-              }else{
-                if(morning.isNotEmpty){
-                  print('not_null');
-                  if(sleep[0].isAfter(morning[0])){
-                    sleep.insert(0, day);
-                    print('new_sleep');
-                    print(sleep);
-                  }
-
-                  for(var j in sleep){
-                    end = 48;
-                    for(var k in morning){
-                      if(j.isBefore(k)){
-                        end = k.hour * 2 + k.minute~/30;
-                        print('end = k.hour * 2 + k.minute~/30');
-                        print(end);
+                    var sleep = [];
+                    var morning = [];
+                    for(var i2 in sleepList){
+                      if(day.year==i2.year && day.month==i2.month && day.day==i2.day){
+                        sleep.add(i2);
+                      }
+                      // print(i.add(Duration(days: 1)));
+                      // print(i2);
+                      // print((i.add(Duration(days: 1))).isBefore(i2));
+                      if((day.add(Duration(days: 1))).isBefore(i2)){
                         break;
                       }
                     }
-                    print('j.hour*2+j.minute~/30');
-                    print(j.hour*2+j.minute~/30);
-                    for(var l=j.hour*2+j.minute~/30; l<end; l++){
-                      graph[l] = 1;
+                    for(var i2 in morningList){
+                      if(day.year==i2.year && day.month==i2.month && day.day==i2.day){
+                        morning.add(i2);
+                      }
+                      // print(i.add(Duration(days: 1)));
+                      // print(i2);
+                      // print((i.add(Duration(days: 1))).isBefore(i2));
+                      if((day.add(Duration(days: 1))).isBefore(i2)){
+                        break;
+                      }
                     }
-                  }
-                }else{
-                  print('morning_null');
-                  for(var j in sleep){
-                    print('j.hour*2+j.minute~/30');
-                    print(j.hour*2+j.minute~/30);
-                    for(var l=j.hour*2+j.minute~/30; l<end; l++){
-                      graph[l] = 1;
+                    print(sleep);
+                    print(morning);
+                    print('-----------------');
+
+
+                    var memori = [0,0,1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0,10,0,11,0,12,0,13,0,14,0,15,0,16,0,17,0,18,0,19,0,20,0,21,0,22,0,23,0];
+                    var graph = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+                    var end = 48;
+
+                    if(sleep.isEmpty){
+                      if(morning.isEmpty){
+                        print('double_null');
+                      }else{
+                        print('sleep_null');
+                        end = morning[morning.length-1].hour*2 + morning[morning.length-1].minute~/30;
+                        for(var l=0; l<end; l++){
+                          graph[l] = 1;
+                        }
+                      }
+                    }else{
+                      if(morning.isNotEmpty){
+                        print('not_null');
+                        if(sleep[0].isAfter(morning[0])){
+                          sleep.insert(0, day);
+                          print('new_sleep');
+                          print(sleep);
+                        }
+
+                        for(var j in sleep){
+                          end = 48;
+                          for(var k in morning){
+                            if(j.isBefore(k)){
+                              end = k.hour * 2 + k.minute~/30;
+                              print('end = k.hour * 2 + k.minute~/30');
+                              print(end);
+                              break;
+                            }
+                          }
+                          print('j.hour*2+j.minute~/30');
+                          print(j.hour*2+j.minute~/30);
+                          for(var l=j.hour*2+j.minute~/30; l<end; l++){
+                            graph[l] = 1;
+                          }
+                        }
+                      }else{
+                        print('morning_null');
+                        for(var j in sleep){
+                          print('j.hour*2+j.minute~/30');
+                          print(j.hour*2+j.minute~/30);
+                          for(var l=j.hour*2+j.minute~/30; l<end; l++){
+                            graph[l] = 1;
+                          }
+                        }
+                      }
                     }
-                  }
-                }
-              }
-              print(memori);
-              print(graph);
-              return Column(
-                children: [
-                  ListTile(
-                    leading: Text(day.month.toString()+'/'+day.day.toString()+'\n'+weekday[day.weekday], style: TextStyle(fontSize: 16)),
-                    subtitle: _Body(graph),
-                  ),
-                  Divider(
-                    height: 2,
-                    thickness: 1,
-                    color: Colors.black,
-                  ),
-                ],
-              );
-            },
+                    print(memori);
+                    print(graph);
+                    return Column(
+                      children: [
+                        ListTile(
+                          leading: Text(day.month.toString()+'/'+day.day.toString()+'\n'+weekday[day.weekday], style: TextStyle(fontSize: 16)),
+                          subtitle: _Body(graph),
+                        ),
+                        Divider(
+                          height: 2,
+                          thickness: 1,
+                          color: Colors.black,
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
-        ),
-      ],
-      ),
     );
   }
 }
@@ -451,4 +455,3 @@ class _SamplePainter extends CustomPainter {
     return true;
   }
 }
-

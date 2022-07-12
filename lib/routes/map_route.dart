@@ -5,6 +5,7 @@ import 'header.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart'; // googlemapのflutterにあるパッケージ
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'footer.dart';
 
 class Map_view extends StatelessWidget {
   // <- (※1)
@@ -13,7 +14,9 @@ class Map_view extends StatelessWidget {
     return Scaffold(
       appBar: Header(),
       body: MapSample(),
-    );
+      bottomNavigationBar: Footer(
+        pageid: 1),
+          );
   }
 }
 
