@@ -64,7 +64,7 @@ class NoteViewModel {
       // 'createdAt': DateTime.now().toString()
     };
 
-    print(lat);
+    //print(lat);
 
     final result =
         await db.update('items', data, where: "id = ?", whereArgs: [id]);
