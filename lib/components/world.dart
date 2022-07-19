@@ -5,7 +5,7 @@ class CatWorld extends SpriteComponent with HasGameRef {
   @override
   Future<void> onLoad() async {
     sprite = await gameRef.loadSprite('bg_house_living.jpeg');
-    size = gameRef.canvasSize;
+    size = sprite!.originalSize * gameRef.canvasSize.y / sprite!.originalSize.y;
     return super.onLoad();
   }
 }

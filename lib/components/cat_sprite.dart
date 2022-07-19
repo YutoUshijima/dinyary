@@ -41,7 +41,7 @@ class CatWalkable extends SpriteAnimationComponent
   @override
   Future<void>? onLoad() async {
     _loadAnimations().then((_) => {animation = _standingAnimation});
-    position = Vector2(400, 400);
+    position = Vector2(gameRef.canvasSize.x / 3, gameRef.canvasSize.y * 2 / 3);
   }
 
   Future<void> _loadAnimations() async {
