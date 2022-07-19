@@ -50,7 +50,7 @@ class _FooterState extends State<Footer> {
   // === 追加部分 ===
   var _routes = [
     TimeLine(),
-    Map(),
+    Map_view(),
     Calendar(),
     Analysis(),
     Game(),

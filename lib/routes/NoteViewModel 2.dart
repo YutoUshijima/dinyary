@@ -7,9 +7,6 @@ class NoteViewModel {
         id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
         diary TEXT,
         tag TEXT,
-        img INTEGER,
-        lat TEXT,
-        lng TEXT,
         createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
       )
       """); // 一旦画像と位置情報はパス
@@ -17,7 +14,7 @@ class NoteViewModel {
 
   static Future<sql.Database> db() async {
     return sql.openDatabase(
-      'note4.db',
+      'note3-3.db',
       version: 1,
       onCreate: (sql.Database database, int version) async {
         await createTables(database);
@@ -25,16 +22,12 @@ class NoteViewModel {
     );
   }
 
-  static Future<int> createItem(
-      String diary, String? tag, int img, String lat, String lng) async {
+  static Future<int> createItem(String diary, String? tag) async {
     final db = await NoteViewModel.db();
 
     final data = {
       'diary': diary,
       'tag': tag,
-      'img': img,
-      'lat': lat,
-      'lng': lng,
     };
     final id = await db.insert('items', data,
         conflictAlgorithm: sql.ConflictAlgorithm.replace);
@@ -52,22 +45,17 @@ class NoteViewModel {
   }
 
   static Future<int> updateItem(
-      int id, String diary, String? tag, int img, String lat, String lng) async {
+      int id, String diary, String? tag) async {
     final db = await NoteViewModel.db();
 
     final data = {
       'diary': diary,
       'tag': tag,
-      'img': img,
-      'lat': lat,
-      'lng': lng,
       // 'createdAt': DateTime.now().toString()
     };
 
-    //print(lat);
-
     final result =
-        await db.update('items', data, where: "id = ?", whereArgs: [id]);
+      await db.update('items', data, where: "id = ?", whereArgs: [id]);
     return result;
   }
 

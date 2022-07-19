@@ -36,6 +36,8 @@ class _HomePageState extends State<TimeLine> {
   // String _selectedMenu = '';
   String _appDocPath = "";
   final TextEditingController _diaryController = TextEditingController();
+  final TextEditingController _latSpecialController = TextEditingController();
+  final TextEditingController _lngSpecialController = TextEditingController();
   //final TextEditingController _tagController = TextEditingController();
 
   final picker = ImagePicker();
@@ -158,6 +160,83 @@ class _HomePageState extends State<TimeLine> {
             ));
   }
 
+  Future<void> _showXYForm(int? id) async {
+    //_imgController = 0;
+    _latController = "0";
+    _lngController = "0";
+
+    if (id != null) {
+      final existingJournal =
+          _memo.firstWhere((element) => element['id'] == id);
+      _latSpecialController.text = existingJournal['lat'];
+      _lngSpecialController.text = existingJournal['lng'];
+      //_tagController.text = existingJournal['tag'];
+    }
+
+    // 編集画面表示
+    await showModalBottomSheet(
+        context: context,
+        elevation: 5,
+        isScrollControlled: true,
+        builder: (_) => Container(
+              padding: EdgeInsets.only(
+                top: 15,
+                left: 15,
+                right: 15,
+                bottom: MediaQuery.of(context).viewInsets.bottom + 120,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  TextField(
+                    controller: _latSpecialController,
+                    keyboardType: TextInputType.multiline,
+                    maxLines: null,
+                    decoration: const InputDecoration(
+                        hintText: 'latitude (e.g. 35.0288040)'),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  // DropdownButtonだとバグるので注意
+                  TextField(
+                    controller: _lngSpecialController,
+                    keyboardType: TextInputType.multiline,
+                    maxLines: null,
+                    decoration: const InputDecoration(
+                        hintText: 'longitude (e.g. 135.7792472)'),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  ElevatedButton(
+                    onPressed: () async {
+                      _latController = _latSpecialController.text;
+                      _lngController = _lngSpecialController.text;
+                      // if (id == null) {
+                      //   await _addItem();
+                      // }
+                      // if (id != null) {
+                      //   await _updateItem(id);
+                      // }
+                      // _diaryController.text = '';
+                      // _tagController = 'Others';
+                      // _imgController = 0;
+                      // _latController = "0";
+                      // _lngController = "0";
+                      //_tagController.text = '';
+                      Navigator.of(context).pop();
+                    },
+                    child: Text(id == null ? 'Create New' : 'Update'),
+                  )
+                ],
+              ),
+            ));
+
+    //Navigator.of(context, rootNavigator: true).pop(context);
+  }
+
   // アイテムの追加
   Future<void> _addItem() async {
     await NoteViewModel.createItem(_diaryController.text, _tagController,
@@ -184,6 +263,7 @@ class _HomePageState extends State<TimeLine> {
 
   // 画像インポートのための関数
   Future<void> _imagePicker(int id) async {
+    // ignore: unnecessary_null_comparison
     if (id != null) {
       final existingJournal =
           _memo.firstWhere((element) => element['id'] == id);
@@ -211,6 +291,7 @@ class _HomePageState extends State<TimeLine> {
       // ユーザビリティは低いがBASE64をそのまま打ち込むよりは推奨
       var bytes = File((pickedFile!).path).readAsBytesSync();
       Directory appDocDir = await getApplicationDocumentsDirectory();
+      // ignore: no_leading_underscores_for_local_identifiers
       String _appDocPath = appDocDir.path;
       String saveFilePath =
           "$_appDocPath/00${id}_00${_imgController + 1}_img.png";
@@ -236,32 +317,30 @@ class _HomePageState extends State<TimeLine> {
           barrierDismissible: false,
           builder: (_) {
             return AlertDialog(
-              title: Text("位置情報を追加しますか？"),
+              title: const Text("位置情報を追加しますか？"),
               actions: [
                 TextButton(
-                  child: Text("現在の位置情報を利用"),
+                  child: const Text("現在の位置情報を利用"),
                   onPressed: () {
                     // 北緯がプラス。南緯がマイナス
-                    print("Use your location");
-                    print("緯度: " + position.latitude.toString());
+                    //print("Use your location");
+                    //print("緯度: " + position.latitude.toString());
                     _latController = position.latitude.toString();
                     // 東経がプラス、西経がマイナス
-                    print("経度: " + position.longitude.toString());
+                    //print("経度: " + position.longitude.toString());
                     _lngController = position.longitude.toString();
                     // 高度
-                    print("高度: " + position.altitude.toString());
+                    //print("高度: " + position.altitude.toString());
                     Navigator.pop(context);
                   },
                 ),
                 TextButton(
-                  child: Text("カスタムされた座標を入力"),
-                  onPressed: () {
-                    // 要編集
-                    Navigator.pop(context);
-                  },
-                ),
+                    child: const Text("カスタムされた座標を入力"),
+                    onPressed: () {
+                      _showXYForm(id);
+                    }),
                 TextButton(
-                  child: Text("座標を追加しない"),
+                  child: const Text("終了"),
                   onPressed: () {
                     Navigator.pop(context);
                   },
@@ -269,10 +348,9 @@ class _HomePageState extends State<TimeLine> {
               ],
             );
           });
-
-      _updateItem(id);
+          _updateItem(id);
     } catch (e) {
-      print(e);
+      debugPrint("error.");
       //debugPrint("Error");
     }
   }
@@ -331,8 +409,7 @@ class _HomePageState extends State<TimeLine> {
     return Scaffold(
       //ヘッダー
       appBar: Header(),
-      bottomNavigationBar: Footer(
-        pageid: 0),
+      bottomNavigationBar: Footer(pageid: 0),
       // 日記の描画
       body: _isLoading
           ? const Center(
@@ -361,8 +438,9 @@ class _HomePageState extends State<TimeLine> {
                       // 日記本文
                       title: Text(_memo[index]['diary']),
                       // 投稿日時
-                      subtitle: Text((_memo[index]['createdAt'])
-                          .toString()), //Text(_memo[index]['createdAt']),
+                      subtitle: Text(
+                          "lat:${_memo[index]['lat']}, lng:${_memo[index]['lng']}" //Text((_memo[index]['createdAt'])
+                              .toString()), //Text(_memo[index]['createdAt']),
                       // ポップアップメニュー
                       trailing: PopupMenuButton<Menu>(
                           onSelected: (Menu item) {
