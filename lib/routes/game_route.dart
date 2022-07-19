@@ -5,13 +5,34 @@ import 'package:flame_audio/flame_audio.dart';
 
 import 'header.dart';
 import 'footer.dart';
+import 'NoteViewModel.dart';
 import '../components/world.dart';
 import '../components/cat.dart';
 import '../components/cat_sprite.dart';
 import '../helpers/audio.dart';
 
-class Game extends StatelessWidget {
-  Game({Key? key}) : super(key: key);
+class Game extends StatefulWidget {
+  const Game({Key? key}) : super(key: key);
+
+  @override
+  _GameState createState() => _GameState();
+}
+
+class _GameState extends State<Game> {
+  List<Map<String, dynamic>> _memo = [];
+
+  void _refreshJournals() async {
+    final data = await NoteViewModel.getNotes();
+    setState(() {
+      _memo = data;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _refreshJournals();
+  }
 
   final game = GameRoot();
 
@@ -61,7 +82,12 @@ class Game extends StatelessWidget {
                 borderRadius: BorderRadius.circular(60),
               ),
               child: IconButton(
-                onPressed: game.addCat,
+                onPressed: () {
+                  if (_memo.isNotEmpty)
+                    game.addCat();
+                  else
+                    print("日記投稿してね");
+                },
                 icon: const Icon(Icons.add),
                 iconSize: 30,
               ),
@@ -74,15 +100,14 @@ class Game extends StatelessWidget {
 class GameRoot extends FlameGame with HasTappableComponents {
   final CatWorld _world = CatWorld();
   int _numCat = 0;
-  final List<Cat> _cats = [
-    Cat('cat_mikeneko2.png', 250, 400),
-    Cat('cat_mikeneko2.png', 400, 400),
+  final List _cats = [
+    CatWalkable(),
+    Nobiruneko(),
   ];
 
   @override
   Future<void> onLoad() async {
     await add(_world);
-    add(CatWalkable());
 
     camera.worldBounds = Rect.fromLTRB(0, 0, _world.size.x, _world.size.y);
     camera.speed = 300;
@@ -104,6 +129,6 @@ class GameRoot extends FlameGame with HasTappableComponents {
       _numCat++;
     }
     // TODO
-    print(canvasSize);
+    // print(canvasSize);
   }
 }
