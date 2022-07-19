@@ -340,7 +340,7 @@ class _HomePageState extends State<TimeLine> {
                       _showXYForm(id);
                     }),
                 TextButton(
-                  child: const Text("終了"),
+                  child: const Text("閉じる"),
                   onPressed: () {
                     Navigator.pop(context);
                   },
