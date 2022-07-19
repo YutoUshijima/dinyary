@@ -192,7 +192,7 @@ class _HomePageState extends State<TimeLine> {
                   TextField(
                     controller: _latSpecialController,
                     keyboardType: TextInputType.multiline,
-                    maxLines: null,
+                    //maxLines: null,
                     decoration: const InputDecoration(
                         hintText: 'latitude (e.g. 35.0288040)'),
                   ),
@@ -203,7 +203,7 @@ class _HomePageState extends State<TimeLine> {
                   TextField(
                     controller: _lngSpecialController,
                     keyboardType: TextInputType.multiline,
-                    maxLines: null,
+                    //maxLines: null,
                     decoration: const InputDecoration(
                         hintText: 'longitude (e.g. 135.7792472)'),
                   ),
@@ -340,7 +340,7 @@ class _HomePageState extends State<TimeLine> {
                       _showXYForm(id);
                     }),
                 TextButton(
-                  child: const Text("終了"),
+                  child: const Text("閉じる"),
                   onPressed: () {
                     Navigator.pop(context);
                   },

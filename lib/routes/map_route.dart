@@ -211,7 +211,7 @@ class MapSample extends HookWidget {
     markerLocations.add(LatLng(35.00, 138.00));
     final markerData = await NoteViewModel.getNotes();
     for (dynamic i = 0; i < markerData.length; i++){
-      markerLocations.add(LatLng(markerData[i]['lat'], markerData[i]['lng']));
+      markerLocations.add(LatLng(double.parse(markerData[i]['lat']), double.parse(markerData[i]['lng'])));
       markerLocations.add(LatLng(35.00, 135.0));
     }
   }
