@@ -1,7 +1,10 @@
+import 'package:dinyary/routes/timeline_route.dart';
 import 'package:flutter/material.dart';
 import 'header.dart';
+import 'footer.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'dart:collection';
+import 'NoteViewModel.dart';
 
 // class Calendar extends StatelessWidget { // <- (※1)
 //   @override
@@ -32,6 +35,7 @@ final kToday = DateTime.now();
 final kFirstDay = DateTime(kToday.year - 2, kToday.month, 1);
 final kLastDay = DateTime(kToday.year + 1, kToday.month, 1);
 
+
 class Calendar extends StatefulWidget {
   const Calendar({Key? key}) : super(key: key);
 
@@ -50,21 +54,32 @@ class _TableState extends State<Calendar> {
   // disable the functionality of range selection
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
+  bool _isLoading = true;
+
+  void _initAsync() async {
+    final data = await NoteViewModel.getNotes();
+    // print(data);
+
+    setState(() {
+      for (final item in data) {
+        final event = Event(item['diary']);
+        (_eventsList[DateTime.parse(item['createdAt'])] == null)
+            ? _eventsList[DateTime.parse(item['createdAt'])] = [event]
+            : _eventsList[DateTime.parse(item['createdAt'])]!.add(event);
+        // print(item['createdAt'].runtimeType.toString());
+        // print(_eventsList);
+      }
+      _isLoading = false;
+    });
+
+    _selectedDay = _focusedDay;
+    _selectedEvents = ValueNotifier(_getEventsForDay(_selectedDay!));
+  }
 
   @override
   void initState() {
     super.initState();
-
-    _selectedDay = _focusedDay;
-    _selectedEvents = ValueNotifier(_getEventsForDay(_selectedDay!));
-
-    _eventsList.addAll(
-        {DateTime.now(): [
-          Event('Today\'s Event 1'),
-          Event('Today\'s Event 2'),
-          ],
-        }
-    );
+    _initAsync();
   }
 
   @override
@@ -93,7 +108,10 @@ class _TableState extends State<Calendar> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: Header(),
-      body: Column(
+    bottomNavigationBar: Footer(
+        pageid: 2),
+      body: _isLoading ? const Center(child: CircularProgressIndicator())
+      : Column(
         children: [
           TableCalendar<Event>(
             firstDay: kFirstDay,
@@ -105,7 +123,6 @@ class _TableState extends State<Calendar> {
             eventLoader: _getEventsForDay,
             startingDayOfWeek: StartingDayOfWeek.monday,
             calendarStyle: CalendarStyle(
-              // Use `CalendarStyle` to customize the UI
               outsideDaysVisible: false,
             ),
             onDaySelected: _onDaySelected,
@@ -138,7 +155,14 @@ class _TableState extends State<Calendar> {
                         borderRadius: BorderRadius.circular(12.0),
                       ),
                       child: ListTile(
-                        // onTap: () =>   // the child should be a navigator
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (BuildContext context) => TimeLine(),
+                            )
+                          );
+                        },
                         title: Text('${value[index]}'),
                       ),
                     );
