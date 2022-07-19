@@ -4,6 +4,7 @@ import 'package:flame/game.dart';
 import 'package:flame_audio/flame_audio.dart';
 
 import 'header.dart';
+import 'footer.dart';
 import '../components/world.dart';
 import '../components/cat.dart';
 import '../components/cat_sprite.dart';
@@ -18,6 +19,7 @@ class Game extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: Header(),
+        bottomNavigationBar: Footer(pageid: 4),
         body: Stack(children: [
           GameWidget(game: game),
           Align(
