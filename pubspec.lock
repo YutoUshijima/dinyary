@@ -198,13 +198,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.6"
-  health:
-    dependency: "direct main"
-    description:
-      name: health
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "4.1.1"
   google_maps:
     dependency: transitive
     description:
@@ -233,6 +226,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.4.0+1"
+  health:
+    dependency: "direct main"
+    description:
+      name: health
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "4.1.1"
   html:
     dependency: transitive
     description:
