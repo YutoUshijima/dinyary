@@ -6,6 +6,8 @@ import 'package:flame_audio/flame_audio.dart';
 import 'header.dart';
 import '../components/world.dart';
 import '../components/cat.dart';
+import '../components/cat_sprite.dart';
+import '../helpers/audio.dart';
 
 class Game extends StatelessWidget {
   Game({Key? key}) : super(key: key);
@@ -78,9 +80,10 @@ class GameRoot extends FlameGame with HasTappableComponents {
   @override
   Future<void> onLoad() async {
     await add(_world);
+    add(CatWalkable());
 
     camera.worldBounds = Rect.fromLTRB(0, 0, _world.size.x, _world.size.y);
-    camera.speed = 100;
+    camera.speed = 300;
 
     await FlameAudio.audioCache.loadAll(catAudio);
   }
@@ -98,5 +101,7 @@ class GameRoot extends FlameGame with HasTappableComponents {
       add(_cats[_numCat]);
       _numCat++;
     }
+    // TODO
+    print(canvasSize);
   }
 }

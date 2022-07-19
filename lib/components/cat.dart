@@ -4,11 +4,7 @@ import 'package:flame/components.dart';
 import 'package:flame/experimental.dart';
 import 'package:flame_audio/flame_audio.dart';
 
-List<String> catAudio = [
-  'cat1a.mp3',
-  'cat1b.mp3',
-  'cat3c.mp3',
-];
+import '../helpers/audio.dart';
 
 class Cat extends SpriteComponent with HasGameRef, TapCallbacks {
   Cat(this.spriteName, this.posX, this.posY) : super(size: Vector2.all(100));
