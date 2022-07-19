@@ -33,6 +33,7 @@ class _HomePageState extends State{
 
   int steps = 0;
   double distance = 0;
+  var distanceString = "";
 
   @override
   void initState() {
@@ -43,8 +44,8 @@ class _HomePageState extends State{
     steps = 0;
     distance = 0;
     /// Get everything from midnight until now
-    DateTime startDate = DateTime(2021, 6, 01, 0, 0, 0);
     DateTime endDate = DateTime.now();
+    DateTime startDate = DateTime(endDate.year, endDate.month, endDate.day);
 
     HealthFactory health = HealthFactory();
 
@@ -90,22 +91,21 @@ class _HomePageState extends State{
 
       /// Print the results
       _healthDataListSteps.forEach((x) {
-        print("Data point: $x");
+        // print("Data point: $x");
         steps += ((x.value as NumericHealthValue).numericValue).toInt();
       });
 
       _healthDataListDistance.forEach((x) {
-        print("Data point: $x");
+        // print("Data point: $x");
         distance += ((x.value as NumericHealthValue).numericValue).toDouble();
       });
+      distanceString= (distance/1000).toStringAsFixed(2);
 
       var date = [];
       _healthDataList.forEach((x) {
         date.add(x.dateFrom.day);
       });
       date = date.toSet().toList();
-      print("date:$date");
-      print(DateTime.now());
 
       /// Update the UI to display the results
       setState(() {
@@ -219,7 +219,7 @@ class _HomePageState extends State{
               thickness: 1,
               color: Colors.black,
             ),
-            Text("歩行距離 :　計 $distance km", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            Text("歩行距離 :　計 $distanceString km", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             Flexible(
               child: Center(
                 child: _content(1),
