@@ -1,10 +1,9 @@
 import 'package:dinyary/routes/timeline_route.dart';
 import 'package:flutter/material.dart';
-import 'routes/header.dart'; // <- header.dart を インポート
-import 'routes/root.dart'; //
+import 'package:intl/date_symbol_data_local.dart';
 
 void main() {
- runApp(MyApp());
+  initializeDateFormatting().then((_) => runApp(MyApp()));
 }
 
 class MyApp extends StatefulWidget {

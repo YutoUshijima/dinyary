@@ -33,8 +33,7 @@ dependencies:
   image_picker: ^0.8.5+3 # 追加
   path_provider: ^2.0.11 #追加
   flutter_hooks: ^0.18.2+1 #追加_map
-
-
+  intl: ^0.17.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

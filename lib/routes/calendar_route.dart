@@ -19,12 +19,14 @@ import 'NoteViewModel.dart';
 
 // Utils
 class Event {
-  final String title;
+  final String diary;
+  final String tag;
 
-  const Event(this.title);
+  const Event(this.diary, this.tag);
 
   @override
-  String toString() => title;
+  String toString() => diary;
+  List<String> _getValue() => [diary, tag];
 }
 
 int getHashCode(DateTime key) { // used for LinkedHashMap
@@ -35,7 +37,6 @@ final kToday = DateTime.now();
 final kFirstDay = DateTime(kToday.year - 2, kToday.month, 1);
 final kLastDay = DateTime(kToday.year + 1, kToday.month, 1);
 
-
 class Calendar extends StatefulWidget {
   const Calendar({Key? key}) : super(key: key);
 
@@ -45,7 +46,6 @@ class Calendar extends StatefulWidget {
 
 class _TableState extends State<Calendar> {
   late final ValueNotifier<List<Event>> _selectedEvents;
-  CalendarFormat _calendarFormat = CalendarFormat.month;
   final LinkedHashMap<DateTime, List<Event>> _eventsList = LinkedHashMap<DateTime, List<Event>>(
     equals: isSameDay,
     hashCode: getHashCode,
@@ -62,7 +62,7 @@ class _TableState extends State<Calendar> {
 
     setState(() {
       for (final item in data) {
-        final event = Event(item['diary']);
+        final event = Event(item['diary'], item['tag']);
         (_eventsList[DateTime.parse(item['createdAt'])] == null)
             ? _eventsList[DateTime.parse(item['createdAt'])] = [event]
             : _eventsList[DateTime.parse(item['createdAt'])]!.add(event);
@@ -114,30 +114,83 @@ class _TableState extends State<Calendar> {
       : Column(
         children: [
           TableCalendar<Event>(
+            locale: 'ja_JP',
             firstDay: kFirstDay,
             lastDay: kLastDay,
             focusedDay: _focusedDay,
             selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-            calendarFormat: _calendarFormat,
+            calendarFormat: CalendarFormat.month,
             rangeSelectionMode: _rangeSelectionMode,
             eventLoader: _getEventsForDay,
             startingDayOfWeek: StartingDayOfWeek.monday,
-            calendarStyle: CalendarStyle(
-              outsideDaysVisible: false,
+            calendarStyle: const CalendarStyle(
+              cellMargin: EdgeInsets.all(6.0),
+              outsideTextStyle: TextStyle(
+                color: Color(0xFFE0E0E0) // Colors.grey[300]
+              ),
+              selectedDecoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.red,
+              ),
+              selectedTextStyle: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 15.0,
+              ),
+              todayDecoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Color(0xFFEF9A9A), // Colors.red[200]
+              ),
+              todayTextStyle: TextStyle(
+                color: Colors.white,
+                fontSize: 15.0,
+              ),
+              weekendTextStyle: TextStyle(
+                color: Color(0xFFFF8A65), // Colors.deepOrange[300]
+              ),
+            ),
+            daysOfWeekHeight: 40.0,
+            daysOfWeekStyle: const DaysOfWeekStyle(
+              decoration: UnderlineTabIndicator(
+                insets: EdgeInsets.only(top: 20.0),
+                borderSide: BorderSide(
+                  width: 1.5,
+                  color: Color(0xFFE0E0E0), // Colors.grey[300]
+                ),
+              ),
+              weekendStyle: TextStyle(
+                color: Color(0xFFFF8A65),
+                fontWeight: FontWeight.bold,
+              ),
+              weekdayStyle: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
             ),
             onDaySelected: _onDaySelected,
-            onFormatChanged: (format) {
-              if (_calendarFormat != format) {
-                setState(() {
-                  _calendarFormat = format;
-                });
-              }
-            },
+            headerStyle: const HeaderStyle(
+              titleCentered: true,
+              formatButtonVisible: false,
+            ),
             onPageChanged: (focusedDay) {
               _focusedDay = focusedDay;
             },
+
+            calendarBuilders: CalendarBuilders(
+              markerBuilder: (context, _, events) {
+                if (events.isNotEmpty) {
+                  return _markerBuildEvents(events);
+                }
+                return null;
+              }
+            ),
+
           ),
-          const SizedBox(height: 8.0),
+
+          const Divider(
+            height: 8.0,
+            thickness: 1.5,
+          ),
+
           Expanded(
             child: ValueListenableBuilder<List<Event>>(
               valueListenable: _selectedEvents,
@@ -147,23 +200,27 @@ class _TableState extends State<Calendar> {
                   itemBuilder: (context, index) {
                     return Container(
                       margin: const EdgeInsets.symmetric(
-                        horizontal: 12.0,
-                        vertical: 12.0,
+                        horizontal: 4.0,
+                        vertical: 4.0,
                       ),
                       decoration: BoxDecoration(
-                        border: Border.all(),
+                        border: Border.all(
+                          color: const Color(0xFFE0E0E0), // Colors.grey[300]
+                        ),
                         borderRadius: BorderRadius.circular(12.0),
+                        color: const Color(0xFFE0E0E0), // Colors.grey[300]
                       ),
                       child: ListTile(
                         onTap: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (BuildContext context) => TimeLine(),
+                              builder: (BuildContext context) => const TimeLine(),
                             )
                           );
                         },
-                        title: Text('${value[index]}'),
+                        title: Text('Diary: ${value[index]._getValue()[0]}'),
+                        subtitle: Text('Tags: ${value[index]._getValue()[1]}'),
                       ),
                     );
                   },
@@ -175,4 +232,33 @@ class _TableState extends State<Calendar> {
       ),
     );
   }
+
+  Widget _markerBuildEvents(List events) {
+    return Positioned(
+      bottom: 8,
+      right: 8,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: Colors.white,
+          ),
+          shape: BoxShape.circle,
+          color: const Color(0xFFEF5350), // Colors.red[400]
+        ),
+        width: 13.0,
+        height: 13.0,
+        child: Text(
+          '${events.length}',
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 10,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      )
+    );
+  }
 }
+
+
