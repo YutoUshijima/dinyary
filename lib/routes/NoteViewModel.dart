@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:sqflite/sqflite.dart' as sql;
 
 class NoteViewModel {
@@ -49,6 +52,12 @@ class NoteViewModel {
   static Future<List<Map<String, dynamic>>> getItem(int id) async {
     final db = await NoteViewModel.db();
     return db.query('items', where: "id = ?", whereArgs: [id], limit: 1);
+  }
+
+  // itemsからimgがある投稿のidとimgとlatとlngのみを取得する関数(map_route.dartで使用)
+  static Future<List<Map<String, dynamic>>> getImageLatLng() async {
+    final db = await NoteViewModel.db();
+    return db.query('items', columns: ['id','img','lat','lng'], where: "img != ?", whereArgs: [0], orderBy: "id");
   }
 
   static Future<int> updateItem(
