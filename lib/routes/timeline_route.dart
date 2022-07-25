@@ -340,7 +340,7 @@ class _HomePageState extends State<TimeLine> {
                       _showXYForm(id);
                     }),
                 TextButton(
-                  child: const Text("終了"),
+                  child: const Text("閉じる"),
                   onPressed: () {
                     Navigator.pop(context);
                   },
@@ -359,7 +359,7 @@ class _HomePageState extends State<TimeLine> {
   void popupMenuSelected(Menu selectedMenu, index) {
     switch (selectedMenu) {
       case Menu.image:
-        // ここに非同期処理を書くと動かない。なぜ？
+        // ここに非同期処理を書くと動かない。なぜ？--Future関数でなく、asyncがないからだと思います。要するにこの関数が同期関数なのに、中に非同期関数があったら値を待つことになっちゃうじゃんってこと。
         _imagePicker(_memo[index]['id']);
         break;
       case Menu.edit:

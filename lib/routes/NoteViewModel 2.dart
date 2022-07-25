@@ -1,7 +1,4 @@
-import 'dart:async';
-
 import 'package:flutter/foundation.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:sqflite/sqflite.dart' as sql;
 
 class NoteViewModel {
@@ -10,9 +7,6 @@ class NoteViewModel {
         id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
         diary TEXT,
         tag TEXT,
-        img INTEGER,
-        lat TEXT,
-        lng TEXT,
         createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
       )
       """); // 一旦画像と位置情報はパス
@@ -20,7 +14,7 @@ class NoteViewModel {
 
   static Future<sql.Database> db() async {
     return sql.openDatabase(
-      'note4.db',
+      'note3-3.db',
       version: 1,
       onCreate: (sql.Database database, int version) async {
         await createTables(database);
@@ -28,16 +22,12 @@ class NoteViewModel {
     );
   }
 
-  static Future<int> createItem(
-      String diary, String? tag, int img, String lat, String lng) async {
+  static Future<int> createItem(String diary, String? tag) async {
     final db = await NoteViewModel.db();
 
     final data = {
       'diary': diary,
       'tag': tag,
-      'img': img,
-      'lat': lat,
-      'lng': lng,
     };
     final id = await db.insert('items', data,
         conflictAlgorithm: sql.ConflictAlgorithm.replace);
@@ -54,29 +44,18 @@ class NoteViewModel {
     return db.query('items', where: "id = ?", whereArgs: [id], limit: 1);
   }
 
-  // itemsからimgがある投稿のidとimgとlatとlngのみを取得する関数(map_route.dartで使用)
-  static Future<List<Map<String, dynamic>>> getImageLatLng() async {
-    final db = await NoteViewModel.db();
-    return db.query('items', columns: ['id','img','lat','lng'], where: "img != ?", whereArgs: [0], orderBy: "id");
-  }
-
   static Future<int> updateItem(
-      int id, String diary, String? tag, int img, String lat, String lng) async {
+      int id, String diary, String? tag) async {
     final db = await NoteViewModel.db();
 
     final data = {
       'diary': diary,
       'tag': tag,
-      'img': img,
-      'lat': lat,
-      'lng': lng,
       // 'createdAt': DateTime.now().toString()
     };
 
-    //print(lat);
-
     final result =
-        await db.update('items', data, where: "id = ?", whereArgs: [id]);
+      await db.update('items', data, where: "id = ?", whereArgs: [id]);
     return result;
   }
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'analysis2_route.dart';
+import 'analysis_health_route.dart';
 import 'NoteViewModel.dart';
 import 'header.dart';
 import 'footer.dart';
@@ -19,6 +20,8 @@ class _HomePageState extends State{
 
   var sleepList = [];
   var morningList = [];
+  var getUpTimeList = [];
+  var sleepTimeList = [];
   var dayList = [];
   var weekday = [];
 
@@ -27,6 +30,21 @@ class _HomePageState extends State{
     setState(() {
       _memo = data;
       _isLoading = false;
+
+      // var getUpTimeList = [];
+      var getUpTimeIterable = _memo.where((element) => element['tag']=='Get up');
+      for(var i in getUpTimeIterable){
+        getUpTimeList.add(DateTime.parse(i["createdAt"]));
+      }
+      // var sleepTimeList = [];
+      var sleepTimeIterable = _memo.where((element) => element['tag']=='Going to bed');
+      for(var i in sleepTimeIterable){
+        sleepTimeList.add(DateTime.parse(i["createdAt"]));
+      }
+      print("getUpTimeList");
+      print(getUpTimeList);
+      print("sleepTimeList");
+      print(sleepTimeList);
 
       weekday = ['(月)', '(月)', '(火)', '(水)', '(木)', '(金)', '(土)', '(日)'];
 
@@ -56,98 +74,86 @@ class _HomePageState extends State{
       morningList.add(DateTime(2022,7,14,20,22));
 
 
+      // // var dayList = [];
+      // for(var i in sleepList + morningList){
+      //   dayList.add(DateTime(i.year, i.month, i.day));
+      // }
+      // dayList = dayList.toSet().toList();
+
       // var dayList = [];
-      for(var i in sleepList + morningList){
+      for(var i in sleepTimeList + getUpTimeList){
         dayList.add(DateTime(i.year, i.month, i.day));
       }
       dayList = dayList.toSet().toList();
 
-      for(var i in dayList){
-        print('======================================');
-        print(i);
-        var sleep = [];
-        var morning = [];
-        for(var i2 in sleepList){
-          if(i.year==i2.year && i.month==i2.month && i.day==i2.day){
-            sleep.add(i2);
-          }
-          // print(i.add(Duration(days: 1)));
-          // print(i2);
-          // print((i.add(Duration(days: 1))).isBefore(i2));
-          if((i.add(Duration(days: 1))).isBefore(i2)){
-            break;
-          }
-        }
-
-        for(var i2 in morningList){
-          if(i.year==i2.year && i.month==i2.month && i.day==i2.day){
-            morning.add(i2);
-          }
-          // print(i.add(Duration(days: 1)));
-          // print(i2);
-          // print((i.add(Duration(days: 1))).isBefore(i2));
-          if((i.add(Duration(days: 1))).isBefore(i2)){
-            break;
-          }
-        }
-        print(sleep);
-        print(morning);
-        print('-----------------');
-
-
-        var memori = [0,0,1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0,10,0,11,0,12,0,13,0,14,0,15,0,16,0,17,0,18,0,19,0,20,0,21,0,22,0,23,0];
-        var graph = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-        var end = 48;
-
-        if(sleep.isEmpty){
-          if(morning.isEmpty){
-            print('double_null');
-          }else{
-            print('sleep_null');
-            end = morning[morning.length-1].hour*2 + morning[morning.length-1].minute~/30;
-            for(var l=0; l<end; l++){
-              graph[l] = 1;
-            }
-          }
-        }else{
-          if(morning.isNotEmpty){
-            print('not_null');
-            if(sleep[0].isAfter(morning[0])){
-              sleep.insert(0, i);
-              print('new_sleep');
-              print(sleep);
-            }
-
-            for(var j in sleep){
-              end = 48;
-              for(var k in morning){
-                if(j.isBefore(k)){
-                  end = k.hour * 2 + k.minute~/30;
-                  print('end = k.hour * 2 + k.minute~/30');
-                  print(end);
-                  break;
-                }
-              }
-              print('j.hour*2+j.minute~/30');
-              print(j.hour*2+j.minute~/30);
-              for(var l=j.hour*2+j.minute~/30; l<end; l++){
-                graph[l] = 1;
-              }
-            }
-          }else{
-            print('morning_null');
-            for(var j in sleep){
-              print('j.hour*2+j.minute~/30');
-              print(j.hour*2+j.minute~/30);
-              for(var l=j.hour*2+j.minute~/30; l<end; l++){
-                graph[l] = 1;
-              }
-            }
-          }
-        }
-        print(memori);
-        print(graph);
-      }
+      // for(var i in dayList){
+      //   print('======================================');
+      //   print(i);
+      //   var sleep = [];
+      //   var morning = [];
+      //   for(var i2 in sleepList){
+      //     if(i.year==i2.year && i.month==i2.month && i.day==i2.day){
+      //       sleep.add(i2);
+      //     }
+      //     if((i.add(Duration(days: 1))).isBefore(i2)){
+      //       break;
+      //     }
+      //   }
+      //
+      //   for(var i2 in morningList){
+      //     if(i.year==i2.year && i.month==i2.month && i.day==i2.day){
+      //       morning.add(i2);
+      //     }
+      //     if((i.add(Duration(days: 1))).isBefore(i2)){
+      //       break;
+      //     }
+      //   }
+      //
+      //   var memori = [0,0,1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0,10,0,11,0,12,0,13,0,14,0,15,0,16,0,17,0,18,0,19,0,20,0,21,0,22,0,23,0];
+      //   var graph = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+      //   var end = 48;
+      //
+      //   if(sleep.isEmpty){
+      //     if(morning.isEmpty){
+      //       print('double_null');
+      //     }else{
+      //       print('sleep_null');
+      //       end = morning[morning.length-1].hour*2 + morning[morning.length-1].minute~/30;
+      //       for(var l=0; l<end; l++){
+      //         graph[l] = 1;
+      //       }
+      //     }
+      //   }else{
+      //     if(morning.isNotEmpty){
+      //       print('not_null');
+      //       if(sleep[0].isAfter(morning[0])){
+      //         sleep.insert(0, i);
+      //       }
+      //
+      //       for(var j in sleep){
+      //         end = 48;
+      //         for(var k in morning){
+      //           if(j.isBefore(k)){
+      //             end = k.hour * 2 + k.minute~/30;
+      //             break;
+      //           }
+      //         }
+      //         for(var l=j.hour*2+j.minute~/30; l<end; l++){
+      //           graph[l] = 1;
+      //         }
+      //       }
+      //     }else{
+      //       print('morning_null');
+      //       for(var j in sleep){
+      //         for(var l=j.hour*2+j.minute~/30; l<end; l++){
+      //           graph[l] = 1;
+      //         }
+      //       }
+      //     }
+      //   }
+      //   print(memori);
+      //   print(graph);
+      // }
 
     });
   }
@@ -160,21 +166,8 @@ class _HomePageState extends State{
 
   @override
   Widget build(BuildContext context) {
-    var getUpTimeIterable = _memo.where((element) => element['tag']=='Get up');
-    var getUpTimeList = [];
-    for(var i in getUpTimeIterable){
-      getUpTimeList.add(i);
-    }
-    var sleepTimeIterable = _memo.where((element) => element['tag']=='Going to bed');
-    var sleepTimeList = [];
-    for(var i in sleepTimeIterable){
-      sleepTimeList.add(i);
-    }
-    print(getUpTimeList);
-    print(sleepTimeList);
     return Scaffold(
-      bottomNavigationBar: Footer(
-        pageid: 3),
+      bottomNavigationBar: Footer(pageid: 3),
       appBar: AppBar(
         leading: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -202,151 +195,114 @@ class _HomePageState extends State{
                 '　　　　　　0 ・・3 ・・6 ・・9 ・・12・・15・・18・・21・・',
                 style: TextStyle(color: Colors.white, fontSize: 12),
               ),
-            )),
+            )
+        ),
         backgroundColor: Colors.black87,
         centerTitle: true,
         elevation: 0.0,
       ),
       body: _isLoading
-          ? const Center(
-        child: CircularProgressIndicator(),
-      )
-      //     : ListView.builder(
-      //   itemCount: getUpTimeList.length,
-      //   itemBuilder: (context, index) {
-      //     String a = getUpTimeList[index]['createdAt'];
-      //     String b = sleepTimeList[index]['createdAt'];
-      //     DateTime getUpTime = DateTime.parse(a);
-      //     DateTime sleepTime = DateTime.parse(b);
-      //
-      //
-      //     for(var i in sleepTimeList){
-      //       String c = i['createdAt'];
-      //       DateTime sleepTime2 = DateTime.parse(c);
-      //       print('sleeptime');
-      //       print(sleepTime2);
-      //       if(sleepTime2.difference(getUpTime).inHours>=0){
-      //         print('for');
-      //       }else{
-      //         print('else');
-      //       }
-      //
-      //     }
-      //     return Text('Get Up at:'+a+'¥n Sleeping at:'+b);
-      //   },// return Text(_memo[index]['tag']=="Get up"?"Get Up at :"+_memo[index]['createdAt']:a);
-      // ),
-
-          : ListView(children: [
-        Center(child: OptimizerButtons()),
-        Flexible(
-          child: ListView.builder(
-            physics: NeverScrollableScrollPhysics(),
-            shrinkWrap: true,
-            itemCount: dayList.length,
-            itemBuilder: (context, index) {
-              print('======================================');
-              var day = dayList[index];
-              print('day');
-              print(day);
-
-              var sleep = [];
-              var morning = [];
-              for(var i2 in sleepList){
-                if(day.year==i2.year && day.month==i2.month && day.day==i2.day){
-                  sleep.add(i2);
-                }
-                // print(i.add(Duration(days: 1)));
-                // print(i2);
-                // print((i.add(Duration(days: 1))).isBefore(i2));
-                if((day.add(Duration(days: 1))).isBefore(i2)){
-                  break;
-                }
-              }
-              for(var i2 in morningList){
-                if(day.year==i2.year && day.month==i2.month && day.day==i2.day){
-                  morning.add(i2);
-                }
-                // print(i.add(Duration(days: 1)));
-                // print(i2);
-                // print((i.add(Duration(days: 1))).isBefore(i2));
-                if((day.add(Duration(days: 1))).isBefore(i2)){
-                  break;
-                }
-              }
-              print(sleep);
-              print(morning);
-              print('-----------------');
-
-
-              var memori = [0,0,1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0,10,0,11,0,12,0,13,0,14,0,15,0,16,0,17,0,18,0,19,0,20,0,21,0,22,0,23,0];
-              var graph = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-              var end = 48;
-
-              if(sleep.isEmpty){
-                if(morning.isEmpty){
-                  print('double_null');
-                }else{
-                  print('sleep_null');
-                  end = morning[morning.length-1].hour*2 + morning[morning.length-1].minute~/30;
-                  for(var l=0; l<end; l++){
-                    graph[l] = 1;
-                  }
-                }
-              }else{
-                if(morning.isNotEmpty){
-                  print('not_null');
-                  if(sleep[0].isAfter(morning[0])){
-                    sleep.insert(0, day);
-                    print('new_sleep');
-                    print(sleep);
-                  }
-
-                  for(var j in sleep){
-                    end = 48;
-                    for(var k in morning){
-                      if(j.isBefore(k)){
-                        end = k.hour * 2 + k.minute~/30;
-                        print('end = k.hour * 2 + k.minute~/30');
-                        print(end);
-                        break;
-                      }
-                    }
-                    print('j.hour*2+j.minute~/30');
-                    print(j.hour*2+j.minute~/30);
-                    for(var l=j.hour*2+j.minute~/30; l<end; l++){
-                      graph[l] = 1;
-                    }
-                  }
-                }else{
-                  print('morning_null');
-                  for(var j in sleep){
-                    print('j.hour*2+j.minute~/30');
-                    print(j.hour*2+j.minute~/30);
-                    for(var l=j.hour*2+j.minute~/30; l<end; l++){
-                      graph[l] = 1;
-                    }
-                  }
-                }
-              }
-              print(memori);
-              print(graph);
-              return Column(
+          ? const Center(child: CircularProgressIndicator(),)
+          : ListView(
+        children: [
+              Center(child: OptimizerButtons()),
+              Row(
                 children: [
-                  ListTile(
-                    leading: Text(day.month.toString()+'/'+day.day.toString()+'\n'+weekday[day.weekday], style: TextStyle(fontSize: 16)),
-                    subtitle: _Body(graph),
-                  ),
-                  Divider(
-                    height: 2,
-                    thickness: 1,
-                    color: Colors.black,
+                  Flexible(
+                    child: ListView.builder(
+                      physics: NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: dayList.length,
+                      itemBuilder: (context, index) {
+                        print('======================================');
+                        var day = dayList[index];
+                        print('day');
+                        print(day);
+
+                        var sleep = [];
+                        var morning = [];
+                        for(var i2 in sleepTimeList){
+                          if(day.year==i2.year && day.month==i2.month && day.day==i2.day){
+                            sleep.add(i2);
+                          }
+                          if((day.add(Duration(days: 1))).isBefore(i2)){
+                            break;
+                          }
+                        }
+                        for(var i2 in getUpTimeList){
+                          if(day.year==i2.year && day.month==i2.month && day.day==i2.day){
+                            morning.add(i2);
+                          }
+                          if((day.add(Duration(days: 1))).isBefore(i2)){
+                            break;
+                          }
+                        }
+
+                        var memori = [0,0,1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0,10,0,11,0,12,0,13,0,14,0,15,0,16,0,17,0,18,0,19,0,20,0,21,0,22,0,23,0];
+                        var graph = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+                        var end = 48;
+
+                        if(sleep.isEmpty){
+                          if(morning.isEmpty){
+                            print('double_null');
+                          }else{
+                            print('sleep_null');
+                            end = morning[morning.length-1].hour*2 + morning[morning.length-1].minute~/30;
+                            for(var l=0; l<end; l++){
+                              graph[l] = 1;
+                            }
+                          }
+                        }else{
+                          if(morning.isNotEmpty){
+                            print('not_null');
+                            if(sleep[0].isAfter(morning[0])){
+                              sleep.insert(0, day);
+                              print('new_sleep');
+                              print(sleep);
+                            }
+
+                            for(var j in sleep){
+                              end = 48;
+                              for(var k in morning){
+                                if(j.isBefore(k)){
+                                  end = k.hour * 2 + k.minute~/30;
+                                  break;
+                                }
+                              }
+                              for(var l=j.hour*2+j.minute~/30; l<end; l++){
+                                graph[l] = 1;
+                              }
+                            }
+                          }else{
+                            print('morning_null');
+                            for(var j in sleep){
+                              for(var l=j.hour*2+j.minute~/30; l<end; l++){
+                                graph[l] = 1;
+                              }
+                            }
+                          }
+                        }
+                        print(memori);
+                        print(graph);
+                        return Column(
+                          children: [
+                            ListTile(
+                              leading: Text(day.month.toString()+'/'+day.day.toString()+'\n'+weekday[day.weekday], style: TextStyle(fontSize: 16)),
+                              subtitle: _Body(graph),
+                            ),
+                            Divider(
+                              height: 2,
+                              thickness: 1,
+                              color: Colors.black,
+                            ),
+                          ],
+                        );
+                      },
+                    ),
                   ),
                 ],
-              );
-            },
-          ),
-        ),
-      ],
+              ),
+        ],
       ),
     );
   }
@@ -373,7 +329,7 @@ class _OptimizerButton extends StatelessWidget {
       onPressed: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => Analysis2()),
+          MaterialPageRoute(builder: (context) => AnalysisHealth()),
         );
       },
       child: Text(
@@ -391,16 +347,7 @@ class OptimizerButtons extends StatelessWidget {
       scrollDirection: Axis.horizontal,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Row(
-          children: [
-            SizedBox(width: 16),
-            _OptimizerButton(text: '日'),
-            SizedBox(width: 16),
-            _OptimizerButton(text: '週'),
-            SizedBox(width: 16),
-            _OptimizerButton(text: '月'),
-          ],
-        ),
+        child: _OptimizerButton(text: 'ヘルスケア'),
       ),
     );
   }
