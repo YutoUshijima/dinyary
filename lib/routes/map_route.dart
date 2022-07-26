@@ -68,7 +68,7 @@ class MapSample extends HookWidget {
 
     // マップに表示するmarkerを作る関数
     Set<Marker> _createMarker() {
-      if(markerLocations.value.isNotEmpty){
+      if(markerLocations.value.isNotEmpty && pinImages.value.isNotEmpty){
         // timelineMarker.clear();
         markerLocations.value.asMap().forEach((i, markerLocation) {
           timelineMarker.add(
