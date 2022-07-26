@@ -438,9 +438,7 @@ class _HomePageState extends State<TimeLine> {
                       // 日記本文
                       title: Text(_memo[index]['diary']),
                       // 投稿日時
-                      subtitle: Text(
-                          "lat:${_memo[index]['lat']}, lng:${_memo[index]['lng']}" //Text((_memo[index]['createdAt'])
-                              .toString()), //Text(_memo[index]['createdAt']),
+                      subtitle: Text(_memo[index]['createdAt']),
                       // ポップアップメニュー
                       trailing: PopupMenuButton<Menu>(
                           onSelected: (Menu item) {

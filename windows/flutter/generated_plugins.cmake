@@ -3,8 +3,8 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
-  geolocator_windows
   audioplayers_windows
+  geolocator_windows
   permission_handler_windows
 )
 
