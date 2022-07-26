@@ -1,3 +1,4 @@
+import 'package:flame/components.dart';
 import 'package:flame/experimental.dart';
 import 'package:flutter/material.dart';
 import 'package:flame/game.dart';
@@ -25,6 +26,14 @@ class _GameState extends State<Game> {
     final data = await NoteViewModel.getNotes();
     setState(() {
       _memo = data;
+      game.addCat(_memo.length);
+      if (_memo.isEmpty)
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            content: Text("日記を投稿してください！"),
+          ),
+        );
     });
   }
 
@@ -73,36 +82,42 @@ class _GameState extends State<Game> {
               ),
             ),
           ),
-          Align(
-            alignment: Alignment.topLeft,
-            child: Container(
-              margin: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: const Color(0x88ffffff),
-                borderRadius: BorderRadius.circular(60),
-              ),
-              child: IconButton(
-                onPressed: () {
-                  if (_memo.isNotEmpty)
-                    game.addCat();
-                  else
-                    print("日記投稿してね");
-                },
-                icon: const Icon(Icons.add),
-                iconSize: 30,
-              ),
-            ),
-          ),
+          // Align(
+          //   alignment: Alignment.topLeft,
+          //   child: Container(
+          //     margin: const EdgeInsets.all(8),
+          //     decoration: BoxDecoration(
+          //       color: const Color(0x88ffffff),
+          //       borderRadius: BorderRadius.circular(60),
+          //     ),
+          //     child: IconButton(
+          //       onPressed: () {
+          //         if (_memo.isEmpty)
+          //           showDialog(
+          //             context: context,
+          //             builder: (context) => AlertDialog(
+          //               content: Text("日記の投稿数が足りません！"),
+          //             ),
+          //           );
+          //       },
+          //       icon: const Icon(Icons.add),
+          //       iconSize: 30,
+          //     ),
+          //   ),
+          // ),
         ]));
   }
 }
 
 class GameRoot extends FlameGame with HasTappableComponents {
+  GameRoot() : super();
+
   final CatWorld _world = CatWorld();
-  int _numCat = 0;
   final List _cats = [
-    CatWalkable(),
     Nobiruneko(),
+    Kabeneko(),
+    Ballneko(),
+    Blackcat(),
   ];
 
   @override
@@ -123,12 +138,9 @@ class GameRoot extends FlameGame with HasTappableComponents {
     camera.moveTo(Vector2(_world.size.x, 0));
   }
 
-  void addCat() {
-    if (_cats.length > _numCat) {
-      add(_cats[_numCat]);
-      _numCat++;
+  void addCat(int num) {
+    for (int i = 0; i < _cats.length && i < num; i++) {
+      add(_cats[i]);
     }
-    // TODO
-    // print(canvasSize);
   }
 }
